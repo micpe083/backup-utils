@@ -11,7 +11,7 @@ import backup.gui.common.DigestFilePanel;
  * TODO: - create copy script
  * TODO: - create delete script
  */
-public class ExplorePanel extends BackupValidatorPanel
+public class ExplorePanel extends BackupUtilsPanel
 {
     private static final long serialVersionUID = 3846651217482501682L;
 

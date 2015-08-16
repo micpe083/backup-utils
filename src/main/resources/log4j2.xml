@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="INFO">
     <Appenders>
         <Console
             name="Console"
             target="SYSTEM_OUT">
-            <PatternLayout
-                pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n" />
         </Console>
+        <RollingFile
+            name="File"
+            fileName="logs/backup-utils.log"
+            filePattern="logs/$${date:yyyy-MM}/backup-utils-%d{MM-dd-yyyy}-%i.log">
+            <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
     </Appenders>
     <Loggers>
-        <Root level="error">
+        <Root level="INFO">
             <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
         </Root>
     </Loggers>
 </Configuration>

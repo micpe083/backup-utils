@@ -13,7 +13,7 @@ import backup.api.FileManager;
 import backup.gui.common.DigestFilePanel;
 import backup.gui.explorer.FileExplorer;
 
-public class ComparePanel extends BackupValidatorPanel implements ActionListener
+public class ComparePanel extends BackupUtilsPanel implements ActionListener
 {
     private static final long serialVersionUID = -5533699007173050922L;
 

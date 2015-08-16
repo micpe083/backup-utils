@@ -3,10 +3,12 @@ package backup.gui.explorer;
 import java.awt.BorderLayout;
 import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 
 import backup.api.FileInfo;
 import backup.api.FileManager;
@@ -15,19 +17,25 @@ public class PathsPanel extends JPanel
 {
     private static final long serialVersionUID = -1009246994340416847L;
 
-    private final JTextArea textArea;
+    private final JList<String> pathList;
+    private final DefaultListModel<String> pathListModel;
+
     private final JLabel label;
 
     public PathsPanel()
     {
         setLayout(new BorderLayout());
 
-        textArea = new JTextArea(3, 20);
-        textArea.setEditable(false);
+        pathListModel = new DefaultListModel<String>();
+
+        //Create the list and put it in a scroll pane.
+        pathList = new JList<String>(pathListModel);
+        pathList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        pathList.setVisibleRowCount(4);
 
         label = new JLabel("-");
 
-        final JScrollPane scrollPane = new JScrollPane(textArea,
+        final JScrollPane scrollPane = new JScrollPane(pathList,
                                                        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
@@ -38,24 +46,22 @@ public class PathsPanel extends JPanel
     public void setFileInfo(final FileManager fileManager,
                             final FileInfo fileInfo)
     {
+        pathListModel.clear();
+
         if (fileManager == null ||
             fileInfo == null)
         {
-            textArea.setText("");
             label.setText("-");
         }
         else
         {
             final List<String> paths = fileManager.getMap().get(fileInfo);
 
-            final StringBuilder buf = new StringBuilder();
             for (final String path : paths)
             {
-                buf.append(path);
-                buf.append('\n');
+                pathListModel.addElement(path);
             }
 
-            textArea.setText(buf.toString());
             label.setText("File Count: " + paths.size());
         }
     }

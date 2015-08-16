@@ -100,6 +100,22 @@
                 value="warning" />
         </module>
         <module name="UpperEll" />
+        <module name="RegexpSinglelineJava">
+            <property
+                name="format"
+                value="System\.(out|err)\.print" />
+            <property
+                name="ignoreComments"
+                value="true" />
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property
+                name="format"
+                value="\.printStackTrace" />
+            <property
+                name="ignoreComments"
+                value="true" />
+        </module>
     </module>
 
 </module>

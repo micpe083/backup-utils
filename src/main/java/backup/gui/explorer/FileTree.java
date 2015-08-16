@@ -54,9 +54,8 @@ public class FileTree extends JPanel implements TreeSelectionListener, ActionLis
         tree.addTreeSelectionListener(this);
 
         final JScrollPane treeView = new JScrollPane(tree,
-                                                     ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                                                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
+                                                     ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         final Dimension minimumSize = new Dimension(100, 50);
         treeView.setMinimumSize(minimumSize);

@@ -9,9 +9,6 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backup.api.DigestUtil;
 import backup.api.DigestUtil.DigestAlg;
 import backup.gui.common.BackupSettings;
@@ -19,10 +16,8 @@ import backup.gui.common.DigestSelectorPanel;
 import backup.gui.common.FileChooserPanel;
 
 
-public class DigestDirectoryPanel extends BackupValidatorPanel implements ActionListener
+public class DigestDirectoryPanel extends BackupUtilsPanel implements ActionListener
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DigestDirectoryPanel.class);
-
     private static final long serialVersionUID = -2862618620912356842L;
 
     private final FileChooserPanel fileChooserDigestDir;

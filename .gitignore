@@ -25,6 +25,8 @@ bin/
 .classpath
 .project
 
+/logs/
+
 /.settings
 
 /*.launch

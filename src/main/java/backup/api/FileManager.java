@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backup.api.DigestUtil.DigestAlg;
 
 public class FileManager
 {
-    //private static final Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
 
     private final Map<FileInfo, List<String>> map = new HashMap<FileInfo, List<String>>();
 
@@ -107,7 +110,7 @@ public class FileManager
 
         if (ret.isEmpty())
         {
-            System.out.println("No duplicates found");
+            LOGGER.info("No duplicates found");
         }
         //else
         //{
@@ -163,11 +166,11 @@ public class FileManager
             final FileInfo fileInfo = entry.getKey();
             final List<String> paths = entry.getValue();
 
-            System.out.println("### " + digestUtil.toFileInfoStr(fileInfo));
+            LOGGER.info("### " + digestUtil.toFileInfoStr(fileInfo));
 
             for (final String path : paths)
             {
-                System.out.println("#      " + path);
+                LOGGER.info("#      " + path);
             }
         }
     }
@@ -179,7 +182,7 @@ public class FileManager
         ret.map.putAll(map);
         ret.map.keySet().removeAll(other.map.keySet());
 
-        System.out.println("missing files: " + ret.map.size());
+        LOGGER.info("missing files: " + ret.map.size());
 
         print(ret.map);
 

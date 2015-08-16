@@ -12,12 +12,17 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
 public class DigestUtil
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DigestUtil.class);
+
     public static final String REGEX_FILE = "file";
     public static final String REGEX_DIGEST = "digest";
     public static final String REGEX_SIZE = "size";
@@ -30,7 +35,7 @@ public class DigestUtil
 
         private final int len;
 
-        private DigestAlg(final int len)
+        DigestAlg(final int len)
         {
             this.len = len;
         }
@@ -201,7 +206,7 @@ public class DigestUtil
 
         final File outputFile = new File(outputDir, outputFilename);
 
-        System.err.println(outputFile);
+        LOGGER.info("Writing digest file: " + outputFile);
 
         try (final BufferedWriter writer = BackupUtil.createWriter(outputFile))
         {
@@ -229,7 +234,7 @@ public class DigestUtil
 
                     final String fileInfoStr = toFileInfoStr(fileInfo);
 
-                    System.out.println(fileInfoStr);
+                    LOGGER.info(fileInfoStr);
 
                     return FileVisitResult.CONTINUE;
                 }
@@ -238,7 +243,7 @@ public class DigestUtil
                 public FileVisitResult visitFileFailed(final Path file,
                                                        final IOException exc) throws IOException
                 {
-                    System.out.println("failed to process file: " + file);
+                    LOGGER.error("failed to process file: " + file, exc);
 
                     return FileVisitResult.CONTINUE;
                 }

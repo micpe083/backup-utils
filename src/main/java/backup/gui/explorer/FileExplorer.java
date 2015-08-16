@@ -22,14 +22,17 @@ public class FileExplorer extends JPanel implements PathSelectionListener
     private final StatsPanel statsPanel;
     private final PathsPanel pathsPanel;
 
-    private FileManager fileManager;
+    private final FileManager fileManager;
 
-    public FileExplorer()
+    public FileExplorer(final FileManager fileManager)
     {
         super(new BorderLayout());
 
+        this.fileManager = fileManager;
+
         fileTree = new FileTree();
         fileTree.addListener(this);
+        fileTree.setFileManager(fileManager);
 
         pathPanel = new PathPanel();
 
@@ -42,6 +45,7 @@ public class FileExplorer extends JPanel implements PathSelectionListener
         panel.add(fileInfoPanel);
 
         statsPanel = new StatsPanel();
+        statsPanel.setFileManager(fileManager);
         panel.add(statsPanel);
 
         pathsPanel = new PathsPanel();
@@ -65,25 +69,16 @@ public class FileExplorer extends JPanel implements PathSelectionListener
         pathsPanel.setFileInfo(fileManager, fileInfo);
     }
 
-    public void setFileManager(final FileManager fileManager)
-    {
-        this.fileManager = fileManager;
-        fileTree.setFileManager(fileManager);
-        statsPanel.setFileManager(fileManager);
-    }
-
     public static FileExplorer createAndShowGUI(final FileManager fileManager)
     {
         final JFrame frame = new JFrame("File Tree");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        final FileExplorer tree = new FileExplorer();
+        final FileExplorer tree = new FileExplorer(fileManager);
         frame.add(tree);
 
         frame.pack();
         frame.setVisible(true);
-
-        tree.setFileManager(fileManager);
 
         frame.setSize(new Dimension(800, 600));
 

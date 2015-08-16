@@ -8,18 +8,23 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import backup.gui.panel.BackupValidatorPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import backup.gui.panel.BackupUtilsPanel;
 import backup.gui.panel.ComparePanel;
 import backup.gui.panel.DigestDirectoryPanel;
 import backup.gui.panel.ExplorePanel;
 
-public class BackupValidatorGui extends JPanel
+public class BackupUtilsGui extends JPanel
 {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(BackupUtilsGui.class);
+
     private static final long serialVersionUID = -4788522561229748501L;
 
     private final JTabbedPane tabbedPane = new JTabbedPane();
 
-    public BackupValidatorGui()
+    public BackupUtilsGui()
     {
         super(new BorderLayout());
 
@@ -33,7 +38,7 @@ public class BackupValidatorGui extends JPanel
     }
 
     private void addTab(final JTabbedPane tabbedPane,
-                        final BackupValidatorPanel panel)
+                        final BackupUtilsPanel panel)
     {
         tabbedPane.addTab(panel.getTabName(), panel);
     }
@@ -45,7 +50,7 @@ public class BackupValidatorGui extends JPanel
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Add content to the window.
-        frame.add(new BackupValidatorGui(), BorderLayout.CENTER);
+        frame.add(new BackupUtilsGui(), BorderLayout.CENTER);
 
         // Display the window.
         frame.pack();
@@ -54,6 +59,8 @@ public class BackupValidatorGui extends JPanel
 
     public static void main(final String[] args)
     {
+        LOGGER.info("asdf");
+
         SwingUtilities.invokeLater(new Runnable()
         {
             @Override
@@ -66,7 +73,7 @@ public class BackupValidatorGui extends JPanel
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    LOGGER.error("Error setting look and feel", e);
                 }
 
                 createAndShowGUI();

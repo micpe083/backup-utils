@@ -5,9 +5,9 @@ import javax.swing.JPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BackupValidatorPanel extends JPanel
+public abstract class BackupUtilsPanel extends JPanel
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(BackupValidatorPanel.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(BackupUtilsPanel.class);
 
     private static final long serialVersionUID = 8983128722402990989L;
 
