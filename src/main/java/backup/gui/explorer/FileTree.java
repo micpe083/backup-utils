@@ -159,10 +159,10 @@ public class FileTree extends JPanel implements TreeSelectionListener, ActionLis
 
     public void setFileManager(final FileManager fileManager)
     {
-        for (final Entry<FileInfo, List<String>> iterable_element : fileManager.getMap().entrySet())
+        for (final Entry<FileInfo, List<String>> entry : fileManager.getMap().entrySet())
         {
-            final FileInfo fileInfo = iterable_element.getKey();
-            final List<String> paths = iterable_element.getValue();
+            final FileInfo fileInfo = entry.getKey();
+            final List<String> paths = entry.getValue();
 
             for (final String string : paths)
             {
@@ -185,7 +185,7 @@ public class FileTree extends JPanel implements TreeSelectionListener, ActionLis
                 list.add(name);
             }
 
-            file = file.getParentFile();                
+            file = file.getParentFile();
         }
         while (file != null);
 
@@ -222,7 +222,7 @@ public class FileTree extends JPanel implements TreeSelectionListener, ActionLis
         currNode.add(childx);
     }
 
-    private final class FileInfoNode
+    private static final class FileInfoNode
     {
         private final FileInfo fileInfo;
 

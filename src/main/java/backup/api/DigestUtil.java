@@ -84,7 +84,7 @@ public class DigestUtil
     public FileInfoPath toFileInfo(final String fileInfoStr)
     {
         final Matcher matcher = pattern.matcher(fileInfoStr);
-        
+
         if (!matcher.matches())
         {
             throw new IllegalArgumentException();
@@ -213,14 +213,14 @@ public class DigestUtil
                 {
                     return FileVisitResult.CONTINUE;
                 }
-    
+
                 @Override
                 public FileVisitResult preVisitDirectory(final Path dir,
                                                          final BasicFileAttributes attrs) throws IOException
                 {
                     return FileVisitResult.CONTINUE;
                 }
-    
+
                 @Override
                 public FileVisitResult visitFile(final Path file,
                                                  final BasicFileAttributes attrs) throws IOException
@@ -228,18 +228,18 @@ public class DigestUtil
                     final FileInfo fileInfo = toFileInfo(file.toFile());
 
                     final String fileInfoStr = toFileInfoStr(fileInfo);
-    
+
                     System.out.println(fileInfoStr);
-    
+
                     return FileVisitResult.CONTINUE;
                 }
-    
+
                 @Override
                 public FileVisitResult visitFileFailed(final Path file,
                                                        final IOException exc) throws IOException
                 {
                     System.out.println("failed to process file: " + file);
-    
+
                     return FileVisitResult.CONTINUE;
                 }
             };

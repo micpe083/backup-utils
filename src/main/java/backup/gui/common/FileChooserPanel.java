@@ -25,7 +25,7 @@ public class FileChooserPanel extends JPanel implements ActionListener
         super(new BorderLayout());
 
         fc = new JFileChooser();
-        fc.setFileSelectionMode(mode); 
+        fc.setFileSelectionMode(mode);
 
         final JLabel label = new JLabel(labelText);
 

@@ -7,6 +7,8 @@ import backup.api.FileManager;
 
 public final class FileManagerUtil
 {
+    private FileManagerUtil() {}
+
     public static void asdf(final FileChooserPanel panel,
                             final FileManager fileManager) throws IOException
     {

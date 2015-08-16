@@ -80,8 +80,8 @@ public class FileManager
 
         final FileSum[] fileSums = new FileSum[]
         {
-            FileSum.createCount(countTotal, countUnique, countDuplicate),                
-            FileSum.createSize(sizeTotal, sizeUnique, sizeDuplicate),                
+            FileSum.createCount(countTotal, countUnique, countDuplicate),
+            FileSum.createSize(sizeTotal, sizeUnique, sizeDuplicate),
         };
 
         return fileSums;
@@ -109,14 +109,14 @@ public class FileManager
         {
             System.out.println("No duplicates found");
         }
-        else
-        {
-            //count, size = get_file_sum (file_dict)
-            //f.write ('# Duplicate files found' + '\n')
-            //f.write ('# Count: ' + str(count) + '\n')
-            //f.write ('# Size (bytes): ' + str(size) + '\n')
-            //print_dict (ret, f)
-        }
+        //else
+        //{
+        //    //count, size = get_file_sum (file_dict)
+        //    //f.write ('# Duplicate files found' + '\n')
+        //    //f.write ('# Count: ' + str(count) + '\n')
+        //    //f.write ('# Size (bytes): ' + str(size) + '\n')
+        //    //print_dict (ret, f)
+        //}
 
         return ret;
     }
@@ -203,15 +203,8 @@ public class FileManager
 
             while ((line = reader.readLine()) != null)
             {
-                if (line.isEmpty())
-                {
-                    // skip - empty line
-                }
-                else if (line.startsWith("#"))
-                {
-                    // skip - comment line
-                }
-                else
+                if (!line.isEmpty() &&
+                    !line.startsWith("#"))
                 {
                     addFile(line);
                 }

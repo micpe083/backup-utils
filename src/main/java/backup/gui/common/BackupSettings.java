@@ -13,7 +13,7 @@ public final class BackupSettings
     public static final String COPY_SCRIPT_BASE_DIR_TO = "copy.script.base.dir.to";
     public static final String COPY_SCRIPT_OUTPUT_DIR = "copy.script.base.dir.output";
 
-    private static BackupSettings INSTANCE;
+    private static BackupSettings instance;
 
     private final Properties properties = new Properties();
 
@@ -31,12 +31,12 @@ public final class BackupSettings
 
     public static BackupSettings getInstance()
     {
-        if (INSTANCE == null)
+        if (instance == null)
         {
-            INSTANCE = new BackupSettings();
+            instance = new BackupSettings();
         }
 
-        return INSTANCE;
+        return instance;
     }
 
     public String getString(final String key)

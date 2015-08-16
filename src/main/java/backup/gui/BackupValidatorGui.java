@@ -52,7 +52,7 @@ public class BackupValidatorGui extends JPanel
         frame.setVisible(true);
     }
 
-    public static void main(String[] args)
+    public static void main(final String[] args)
     {
         SwingUtilities.invokeLater(new Runnable()
         {
