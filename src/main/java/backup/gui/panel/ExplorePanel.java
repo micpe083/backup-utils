@@ -1,7 +1,5 @@
 package backup.gui.panel;
 
-import java.awt.BorderLayout;
-
 import backup.gui.common.DigestFilePanel;
 
 /**
@@ -13,26 +11,15 @@ import backup.gui.common.DigestFilePanel;
  */
 public class ExplorePanel extends BackupUtilsPanel
 {
-    private static final long serialVersionUID = 3846651217482501682L;
-
-    private final DigestFilePanel digestFilePanel;
-
     public ExplorePanel()
     {
-        setLayout(new BorderLayout());
-
-        digestFilePanel = new DigestFilePanel();
-        add(digestFilePanel);
+        final DigestFilePanel digestFilePanel = new DigestFilePanel();
+        setCenter(digestFilePanel);
     }
 
     @Override
     public String getTabName()
     {
         return "Explore";
-    }
-
-    @Override
-    public void execute()
-    {
     }
 }

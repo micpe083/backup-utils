@@ -1,159 +1,61 @@
 package backup.gui.explorer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.BorderPane;
 import backup.api.FileInfo;
 import backup.api.FileManager;
+import backup.gui.common.GuiUtils;
 
-public class FileTree extends JPanel implements TreeSelectionListener, ActionListener
+public class FileTree extends BorderPane
 {
-    private static final long serialVersionUID = 2037529673702627281L;
-
-    private final JTree tree;
-
-    private final DefaultMutableTreeNode root;
-
     private final List<PathSelectionListener> listeners = new ArrayList<PathSelectionListener>();
 
-    private final JButton expandAllButton = new JButton("Expand All");
-    private final JButton collapseAllButton = new JButton("Collapse All");
+    private final TreeItem<Object> root;
 
     public FileTree()
     {
-        super(new BorderLayout());
+        root = new TreeItem<Object>("/");
 
-        expandAllButton.addActionListener(this);
-        collapseAllButton.addActionListener(this);
+        final TreeView<Object> tree = new TreeView<Object>(root);
+        tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        root = new DefaultMutableTreeNode("/");
+        tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> treeItemSelected(newValue));
 
-        tree = new JTree(root);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        final ScrollPane scrollPane = GuiUtils.createScrollPane(tree);
 
-        tree.addTreeSelectionListener(this);
-
-        final JScrollPane treeView = new JScrollPane(tree,
-                                                     ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        final Dimension minimumSize = new Dimension(100, 50);
-        treeView.setMinimumSize(minimumSize);
-
-        add(treeView);
+        setCenter(scrollPane);
     }
 
-    @Override
-    public void actionPerformed(final ActionEvent e)
+    public Button createExpandAllButton()
     {
-        if (e.getSource() == expandAllButton)
-        {
-            expandAll(tree, new TreePath(root), true);
-        }
-        else if (e.getSource() == collapseAllButton)
-        {
-            expandAll(tree, new TreePath(root), false);
-        }
-    }
-
-    private void expandAll(final JTree tree, final TreePath parent, final boolean isExpand)
-    {
-        final TreeNode node = (TreeNode) parent.getLastPathComponent();
-        if (node.getChildCount() >= 0)
-        {
-            for (final Enumeration<?> e = node.children(); e.hasMoreElements();)
-            {
-                final TreeNode n = (TreeNode) e.nextElement();
-                final TreePath path = parent.pathByAddingChild(n);
-                expandAll(tree, path, isExpand);
-            }
-        }
-
-        if (isExpand)
-        {
-            tree.expandPath(parent);
-        }
-        else
-        {
-            tree.collapsePath(parent);
-        }
-    }
-
-    public JButton getExpandAllButton()
-    {
+        final Button expandAllButton = new Button("Expand All");
+        expandAllButton.setOnAction(e -> expandAll(root, true));
         return expandAllButton;
     }
 
-    public JButton getCollapseAllButton()
+    public Button createCollapseAllButton()
     {
+        final Button collapseAllButton = new Button("Collapse All");
+        collapseAllButton.setOnAction(e -> expandAll(root, false));
         return collapseAllButton;
     }
 
     public void addListener(final PathSelectionListener l)
     {
-        listeners.add(l);
-    }
-
-    private void notifyListeners(final FileInfo fileInfo, final String path)
-    {
-        for (final PathSelectionListener pathSelectionListener : listeners)
+        synchronized (listeners)
         {
-            pathSelectionListener.fileSelected(fileInfo, path);
+            listeners.add(l);
         }
-    }
-
-    public void valueChanged(final TreeSelectionEvent e)
-    {
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-
-        if (node == null)
-        {
-            return;
-        }
-
-        final StringBuilder buf = new StringBuilder();
-
-        FileInfo fileInfo = null;
-
-        for (final TreeNode currNode : node.getPath())
-        {
-            if (currNode.isLeaf())
-            {
-                final FileInfoNode fileInfoNode = (FileInfoNode) ((DefaultMutableTreeNode) currNode).getUserObject();
-
-                fileInfo = fileInfoNode.getFileInfo();
-                buf.append(fileInfoNode);
-            }
-            else
-            {
-                final String name = (String) ((DefaultMutableTreeNode) currNode).getUserObject();
-
-                buf.append(name);
-                buf.append("/");
-            }
-        }
-
-        notifyListeners(fileInfo, buf.toString());
     }
 
     public void setFileManager(final FileManager fileManager)
@@ -167,6 +69,35 @@ public class FileTree extends JPanel implements TreeSelectionListener, ActionLis
             {
                 addFile(fileInfo, string);
             }
+        }
+    }
+
+    private void notifyListeners(final FileInfo fileInfo, final String path)
+    {
+        synchronized (listeners)
+        {
+            for (final PathSelectionListener pathSelectionListener : listeners)
+            {
+                pathSelectionListener.fileSelected(fileInfo, path);
+            }
+        }
+    }
+
+    private void expandAll(final TreeItem<Object> treeItem,
+                           final boolean isExpand)
+    {
+        if (treeItem == null)
+        {
+            return;
+        }
+
+        treeItem.setExpanded(isExpand);
+
+        for (final TreeItem<Object> currTreeItem : treeItem.getChildren())
+        {
+            currTreeItem.setExpanded(isExpand);
+
+            expandAll(currTreeItem, isExpand);
         }
     }
 
@@ -190,35 +121,84 @@ public class FileTree extends JPanel implements TreeSelectionListener, ActionLis
 
         Collections.reverse(list);
 
-        DefaultMutableTreeNode currNode = this.root;
+        TreeItem<Object> currParent = this.root;
 
         for (final String nodeStr : list)
         {
-            DefaultMutableTreeNode childx = null;
+            TreeItem<Object> currChild = null;
 
-            for (int i = 0; i < currNode.getChildCount(); i++)
+            for (final TreeItem<Object> testChild : currParent.getChildren())
             {
-                final DefaultMutableTreeNode child = (DefaultMutableTreeNode) currNode.getChildAt(i);
+                final Object obj = testChild.getValue();
 
-                final Object x = child.getUserObject();
-
-                if (nodeStr.equals(x))
+                if (nodeStr.equals(obj))
                 {
-                    childx = child;
+                    currChild = testChild;
+                    break;
                 }
             }
 
-            if (childx == null)
+            if (currChild == null)
             {
-                childx = new DefaultMutableTreeNode(nodeStr, true);
-                currNode.add(childx);
+                currChild = new TreeItem<Object>(nodeStr);
+
+                currParent.getChildren().add(currChild);
             }
 
-            currNode = childx;
+            currParent = currChild;
         }
 
-        final DefaultMutableTreeNode childx = new DefaultMutableTreeNode(new FileInfoNode(fileInfo), false);
-        currNode.add(childx);
+        currParent.getChildren().add(new TreeItem<Object>(new FileInfoNode(fileInfo)));
+    }
+
+    private void treeItemSelected(final TreeItem<Object> selectedTreeItem)
+    {
+        if (selectedTreeItem == null)
+        {
+            return;
+        }
+
+        FileInfo fileInfo = null;
+
+        TreeItem<Object> curr = selectedTreeItem;
+
+        final List<String> pathList = new ArrayList<>();
+
+        do
+        {
+            final Object obj = curr.getValue();
+
+            if (obj instanceof String)
+            {
+                final String pathElement = (String) obj;
+                pathList.add(pathElement);
+            }
+            else if (obj instanceof FileInfoNode)
+            {
+                final FileInfoNode fileInfoNode = (FileInfoNode) obj;
+                fileInfo = fileInfoNode.getFileInfo();
+            }
+
+            curr = curr.getParent();
+        }
+        while (curr != null);
+
+        Collections.reverse(pathList);
+
+        final StringBuilder buf = new StringBuilder();
+
+        for (final String pathElement : pathList)
+        {
+            buf.append(pathElement);
+            buf.append("/");
+        }
+
+        if (fileInfo != null)
+        {
+            buf.append(fileInfo.getFilename());
+        }
+
+        notifyListeners(fileInfo, buf.toString());
     }
 
     private static final class FileInfoNode

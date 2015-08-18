@@ -1,5 +1,6 @@
 package backup.gui.common;
 
+import java.net.URL;
 import java.util.Properties;
 
 public final class BackupSettings
@@ -21,7 +22,7 @@ public final class BackupSettings
     {
         try
         {
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("backup-utils.properties"));
+            properties.load(getFile().openStream());
         }
         catch (final Exception e)
         {
@@ -29,7 +30,12 @@ public final class BackupSettings
         }
     }
 
-    public static BackupSettings getInstance()
+    private static URL getFile()
+    {
+        return BackupSettings.class.getClassLoader().getResource("backup-utils.properties");
+    }
+
+    public static synchronized BackupSettings getInstance()
     {
         if (instance == null)
         {

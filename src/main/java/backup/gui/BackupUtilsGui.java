@@ -1,83 +1,52 @@
 package backup.gui;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import backup.gui.panel.BackupUtilsPanel;
 import backup.gui.panel.ComparePanel;
 import backup.gui.panel.DigestDirectoryPanel;
 import backup.gui.panel.ExplorePanel;
 
-public class BackupUtilsGui extends JPanel
+public class BackupUtilsGui extends Application
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(BackupUtilsGui.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(BackupUtilsGui.class);
 
-    private static final long serialVersionUID = -4788522561229748501L;
-
-    private final JTabbedPane tabbedPane = new JTabbedPane();
-
-    public BackupUtilsGui()
+    private void addTab(final TabPane tabbedPane,
+                        final BackupUtilsPanel panel)
     {
-        super(new BorderLayout());
+        final Tab tab = new Tab();
 
-        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tab.setText(panel.getTabName());
+        tab.setContent(panel);
+        tab.closableProperty().set(false);
+
+        tabbedPane.getTabs().add(tab);
+    }
+
+    @Override
+    public void start(final Stage primaryStage) throws Exception
+    {
+        final TabPane tabbedPane = new TabPane();
 
         addTab(tabbedPane, new ExplorePanel());
         addTab(tabbedPane, new DigestDirectoryPanel());
         addTab(tabbedPane, new ComparePanel());
 
-        add(tabbedPane, BorderLayout.CENTER);
-    }
+        final BorderPane root = new BorderPane();
+        root.setCenter(tabbedPane);
 
-    private void addTab(final JTabbedPane tabbedPane,
-                        final BackupUtilsPanel panel)
-    {
-        tabbedPane.addTab(panel.getTabName(), panel);
-    }
+        final Scene scene = new Scene(root, 800, 200);
 
-    private static void createAndShowGUI()
-    {
-        // Create and set up the window.
-        JFrame frame = new JFrame("Backup Validator");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Add content to the window.
-        frame.add(new BackupUtilsGui(), BorderLayout.CENTER);
-
-        // Display the window.
-        frame.pack();
-        frame.setVisible(true);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void main(final String[] args)
     {
-        LOGGER.info("asdf");
-
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-                }
-                catch (Exception e)
-                {
-                    LOGGER.error("Error setting look and feel", e);
-                }
-
-                createAndShowGUI();
-            }
-        });
+        launch(args);
     }
 }

@@ -1,86 +1,74 @@
 package backup.gui.explorer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import backup.api.FileInfo;
 import backup.api.FileManager;
 import backup.gui.common.StatsPanel;
 
-public class FileExplorer extends JPanel implements PathSelectionListener
+public class FileExplorer extends BorderPane implements PathSelectionListener
 {
-    private static final long serialVersionUID = 2037529673702627281L;
-
-    private final FileTree fileTree;
     private final PathPanel pathPanel;
     private final FileInfoPanel fileInfoPanel;
-    private final StatsPanel statsPanel;
-    private final PathsPanel pathsPanel;
+    private final PathsPanel2 pathsPanel;
 
     private final FileManager fileManager;
 
     public FileExplorer(final FileManager fileManager)
     {
-        super(new BorderLayout());
-
         this.fileManager = fileManager;
 
-        fileTree = new FileTree();
+        final FileTree fileTree = new FileTree();
         fileTree.addListener(this);
         fileTree.setFileManager(fileManager);
 
+        setCenter(fileTree);
+
+        final VBox vbox = new VBox();
+
         pathPanel = new PathPanel();
-
-        add(fileTree, BorderLayout.CENTER);
-
-        final JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(pathPanel);
+        vbox.getChildren().add(pathPanel);
 
         fileInfoPanel = new FileInfoPanel();
-        panel.add(fileInfoPanel);
+        vbox.getChildren().add(fileInfoPanel);
 
-        statsPanel = new StatsPanel();
+        final StatsPanel statsPanel = new StatsPanel();
         statsPanel.setFileManager(fileManager);
-        panel.add(statsPanel);
+        vbox.getChildren().add(statsPanel);
 
-        pathsPanel = new PathsPanel();
-        panel.add(pathsPanel);
+        pathsPanel = new PathsPanel2();
+        vbox.getChildren().add(pathsPanel);
 
-        final JPanel buttonPanel = new JPanel(new FlowLayout());
-        buttonPanel.add(fileTree.getExpandAllButton());
-        buttonPanel.add(fileTree.getCollapseAllButton());
-        panel.add(buttonPanel);
+        final HBox buttonPanel = new HBox();
+        buttonPanel.getChildren().add(fileTree.createExpandAllButton());
+        buttonPanel.getChildren().add(fileTree.createCollapseAllButton());
+        vbox.getChildren().add(buttonPanel);
 
-        add(panel, BorderLayout.SOUTH);
+        setBottom(vbox);
     }
 
     @Override
     public void fileSelected(final FileInfo fileInfo,
                              final String path)
     {
-        fileInfoPanel.setFileInfo(fileInfo);
         pathPanel.setPath(path);
-
+        fileInfoPanel.setFileInfo(fileInfo);
         pathsPanel.setFileInfo(fileManager, fileInfo);
     }
 
-    public static FileExplorer createAndShowGUI(final FileManager fileManager)
+    public static FileExplorer show(final FileManager fileManager)
     {
-        final JFrame frame = new JFrame("File Tree");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         final FileExplorer tree = new FileExplorer(fileManager);
-        frame.add(tree);
 
-        frame.pack();
-        frame.setVisible(true);
+        final Scene scene = new Scene(tree, 800, 600);
 
-        frame.setSize(new Dimension(800, 600));
+        final Stage stage = new Stage();
+        stage.setTitle("File Tree");
+        stage.setScene(scene);
+        stage.show();
 
         return tree;
     }

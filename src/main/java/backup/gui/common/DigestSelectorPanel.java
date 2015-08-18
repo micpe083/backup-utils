@@ -1,46 +1,36 @@
 package backup.gui.common;
 
-import java.awt.FlowLayout;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
 import backup.api.DigestUtil.DigestAlg;
 
-public class DigestSelectorPanel extends JPanel
+public class DigestSelectorPanel extends HBox
 {
-    private static final long serialVersionUID = 1327242463467592116L;
-
-    private final ButtonGroup group = new ButtonGroup();
+    private final ToggleGroup group = new ToggleGroup();
 
     public DigestSelectorPanel()
     {
-        super(new FlowLayout());
+        final Label label = new Label("Digest alg:");
 
-        final JLabel label = new JLabel("Digest alg:");
-
-        add(label);
+        getChildren().add(label);
 
         for (final DigestAlg digestAlg : DigestAlg.values())
         {
-            final JRadioButton digestButton = new JRadioButton(digestAlg.getName());
+            final RadioButton digestButton = new RadioButton(digestAlg.getName());
 
-            digestButton.setActionCommand(digestAlg.getName());
+            digestButton.setToggleGroup(group);
 
-            group.add(digestButton);
-
-            add(digestButton);
-
-            digestButton.setSelected(true);
+            getChildren().add(digestButton);
         }
 
+        group.getToggles().get(0).setSelected(true);
     }
 
     public DigestAlg getDigestAlg()
     {
-        final String digest = group.getSelection().getActionCommand();
+        final String digest = ((RadioButton) group.getSelectedToggle()).getText();
 
         return DigestAlg.valueOf(digest);
     }

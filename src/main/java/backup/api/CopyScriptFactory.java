@@ -20,10 +20,10 @@ public final class CopyScriptFactory
                          BackupSettings.getInstance().getString(BackupSettings.COPY_SCRIPT_BASE_DIR_TO));
     }
 
-    private static void createCopyScript(final FileManager fileManager,
-                                         final String outputDir,
-                                         final String baseDirFrom,
-                                         final String baseDirTo) throws IOException
+    public static File createCopyScript(final FileManager fileManager,
+                                        final String outputDir,
+                                        final String baseDirFrom,
+                                        final String baseDirTo) throws IOException
     {
         final FileManager fileManagerUnique = fileManager.getUniquePaths();
 
@@ -60,6 +60,8 @@ public final class CopyScriptFactory
             writer.write("echo elapsed seconds: ${elapsed}\n");
             writer.write('\n');
         }
+
+        return file;
     }
 
     private static void createCopyScript(final BufferedWriter writer,

@@ -1,52 +1,67 @@
 package backup.gui.explorer;
 
-import java.awt.BorderLayout;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import backup.api.BackupUtil;
 import backup.api.FileInfo;
+import backup.api.FileInfoPath;
 import backup.api.FileManager;
+import backup.gui.common.GuiUtils;
 
-public class PathsPanel extends JPanel
+public class PathsPanel extends BorderPane
 {
-    private static final long serialVersionUID = -1009246994340416847L;
+    private final ObservableList<FileInfoPath> tableItems;
 
-    private final JList<String> pathList;
-    private final DefaultListModel<String> pathListModel;
-
-    private final JLabel label;
+    private final Label label;
 
     public PathsPanel()
     {
-        setLayout(new BorderLayout());
+        tableItems = FXCollections.observableArrayList();
 
-        pathListModel = new DefaultListModel<String>();
+        final TableView<FileInfoPath> tableView = new TableView<>(tableItems);
 
-        //Create the list and put it in a scroll pane.
-        pathList = new JList<String>(pathListModel);
-        pathList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        pathList.setVisibleRowCount(4);
+        final TableColumn<FileInfoPath, String> col1 = new TableColumn<>("Path");
+        col1.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getPath()));
+        col1.prefWidthProperty().bind(tableView.widthProperty().multiply(0.6));
+        tableView.getColumns().add(col1);
 
-        label = new JLabel("-");
+        final TableColumn<FileInfoPath, String> col2 = new TableColumn<>("Size");
+        col2.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(BackupUtil.humanReadableByteCount(p.getValue().getFileInfo().getSize())));
+        col2.prefWidthProperty().bind(tableView.widthProperty().multiply(0.1));
+        tableView.getColumns().add(col2);
 
-        final JScrollPane scrollPane = new JScrollPane(pathList,
-                                                       JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                       JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        final TableColumn<FileInfoPath, String> col3 = new TableColumn<>("Digest");
+        col3.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getFileInfo().getHash()));
+        col3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
+        tableView.getColumns().add(col3);
 
-        add(scrollPane, BorderLayout.CENTER);
-        add(label, BorderLayout.SOUTH);
+        tableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        //pathList.setVisibleRowCount(4);
+        tableView.setPrefHeight(100);
+
+        label = new Label();
+
+        final ScrollPane scrollPane = GuiUtils.createScrollPane(tableView);
+
+        setCenter(scrollPane);
+        setBottom(label);
+
+        setFileInfo(null, null);
     }
 
     public void setFileInfo(final FileManager fileManager,
                             final FileInfo fileInfo)
     {
-        pathListModel.clear();
+        tableItems.clear();
 
         if (fileManager == null ||
             fileInfo == null)
@@ -59,7 +74,9 @@ public class PathsPanel extends JPanel
 
             for (final String path : paths)
             {
-                pathListModel.addElement(path);
+                final FileInfoPath fileInfoPath = new FileInfoPath(fileInfo, path);
+
+                tableItems.add(fileInfoPath);
             }
 
             label.setText("File Count: " + paths.size());

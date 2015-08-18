@@ -1,69 +1,45 @@
 package backup.gui.panel;
 
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import backup.api.FileManager;
 import backup.gui.common.DigestFilePanel;
 import backup.gui.explorer.FileExplorer;
 
-public class ComparePanel extends BackupUtilsPanel implements ActionListener
+public class ComparePanel extends BackupUtilsPanel
 {
-    private static final long serialVersionUID = -5533699007173050922L;
-
-    private final DigestFilePanel digestFilePanelOriginal;
-    private final DigestFilePanel digestFilePanelCurrent;
-
-    private final JButton missingButton;
-    private final JButton newButton;
-
     public ComparePanel()
     {
-        setLayout(new GridLayout(0, 1));
+        final VBox vbox = new VBox();
 
-        digestFilePanelOriginal = new DigestFilePanel("Original File:");
-        add(digestFilePanelOriginal);
+        setCenter(vbox);
 
-        digestFilePanelCurrent = new DigestFilePanel("Current File:");
-        add(digestFilePanelCurrent);
+        final DigestFilePanel digestFilePanelOriginal = new DigestFilePanel("Original File:");
+        vbox.getChildren().add(digestFilePanelOriginal);
 
-        missingButton = new JButton("Missing");
-        missingButton.addActionListener(this);
+        final DigestFilePanel digestFilePanelCurrent = new DigestFilePanel("Current File:");
+        vbox.getChildren().add(digestFilePanelCurrent);
 
-        newButton = new JButton("New");
-        newButton.addActionListener(this);
+        final Button missingButton = new Button("Missing");
+        missingButton.setOnAction(e -> compare(digestFilePanelOriginal,
+                                               digestFilePanelCurrent));
 
-        final JPanel buttonPanel = new JPanel(new FlowLayout());
-        buttonPanel.add(missingButton);
-        buttonPanel.add(newButton);
-        add(buttonPanel);
+        final Button newButton = new Button("New");
+        newButton.setOnAction(e -> compare(digestFilePanelCurrent,
+                                           digestFilePanelOriginal));
+
+        final HBox buttonPane = new HBox();
+        buttonPane.getChildren().add(missingButton);
+        buttonPane.getChildren().add(newButton);
+
+        vbox.getChildren().add(buttonPane);
     }
 
     @Override
     public String getTabName()
     {
         return "Compare";
-    }
-
-    @Override
-    public void actionPerformed(final ActionEvent e)
-    {
-        if (e.getSource() == missingButton)
-        {
-            compare(digestFilePanelOriginal,
-                    digestFilePanelCurrent);
-        }
-        else if (e.getSource() == newButton)
-        {
-            compare(digestFilePanelCurrent,
-                    digestFilePanelOriginal);
-        }
     }
 
     private void compare(final DigestFilePanel digestFilePanel1,
@@ -74,26 +50,6 @@ public class ComparePanel extends BackupUtilsPanel implements ActionListener
 
         final FileManager fileManagerMissing = fileManager1.getMissing(fileManager2);
 
-        FileExplorer.createAndShowGUI(fileManagerMissing);
-    }
-
-    @Override
-    public void execute()
-    {
-        try
-        {
-            digestFilePanelOriginal.processFile();
-
-            digestFilePanelCurrent.processFile();
-        }
-        catch (Exception e)
-        {
-            JOptionPane.showMessageDialog(this,
-                                          "Failed to process directory: " + e.getMessage(),
-                                          "Error",
-                                          JOptionPane.ERROR_MESSAGE);
-
-            LOGGER.error(e.getMessage(), e);
-        }
+        FileExplorer.show(fileManagerMissing);
     }
 }

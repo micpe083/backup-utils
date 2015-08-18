@@ -1,25 +1,20 @@
 package backup.gui.panel;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
 import backup.api.DigestUtil;
 import backup.api.DigestUtil.DigestAlg;
 import backup.gui.common.BackupSettings;
+import backup.gui.common.GuiUtils;
 import backup.gui.common.DigestSelectorPanel;
 import backup.gui.common.FileChooserPanel;
 
 
-public class DigestDirectoryPanel extends BackupUtilsPanel implements ActionListener
+public class DigestDirectoryPanel extends BackupUtilsPanel
 {
-    private static final long serialVersionUID = -2862618620912356842L;
-
     private final FileChooserPanel fileChooserDigestDir;
     private final FileChooserPanel fileChooserOutputDir;
 
@@ -27,19 +22,25 @@ public class DigestDirectoryPanel extends BackupUtilsPanel implements ActionList
 
     public DigestDirectoryPanel()
     {
-        setLayout(new GridLayout(0, 1));
+        final VBox pane = new VBox();
 
-        fileChooserDigestDir = new FileChooserPanel("Digest dir:", JFileChooser.DIRECTORIES_ONLY);
+        fileChooserDigestDir = new FileChooserPanel("Digest dir:", false);
         fileChooserDigestDir.setSelection(BackupSettings.getInstance().getString(BackupSettings.DIGEST_DIR));
 
-        fileChooserOutputDir = new FileChooserPanel("Output dir", JFileChooser.DIRECTORIES_ONLY);
+        fileChooserOutputDir = new FileChooserPanel("Output dir", false);
         fileChooserOutputDir.setSelection(BackupSettings.getInstance().getString(BackupSettings.DIGEST_OUTPUT_DIR));
 
         digestSelectorPanel = new DigestSelectorPanel();
-        add(digestSelectorPanel);
+        pane.getChildren().add(digestSelectorPanel);
 
-        add(fileChooserDigestDir);
-        add(fileChooserOutputDir);
+        final Button executeButton = new Button("Execute");
+        executeButton.setOnAction(event -> execute());
+
+        pane.getChildren().add(fileChooserDigestDir);
+        pane.getChildren().add(fileChooserOutputDir);
+        pane.getChildren().add(executeButton);
+
+        setCenter(pane);
     }
 
     @Override
@@ -48,8 +49,7 @@ public class DigestDirectoryPanel extends BackupUtilsPanel implements ActionList
         return "Create Digest";
     }
 
-    @Override
-    public void execute()
+    private void execute()
     {
         try
         {
@@ -65,17 +65,10 @@ public class DigestDirectoryPanel extends BackupUtilsPanel implements ActionList
         }
         catch (IOException e)
         {
-            JOptionPane.showMessageDialog(this,
-                                          "Failed to process directory: " + e.getMessage(),
-                                          "Error",
-                                          JOptionPane.ERROR_MESSAGE);
-
-            LOGGER.error(e.getMessage(), e);
+            GuiUtils.showErrorMessage(this,
+                                      "Failed to process directory: " + e.getMessage(),
+                                      "Error",
+                                      e);
         }
-    }
-
-    @Override
-    public void actionPerformed(final ActionEvent e)
-    {
     }
 }

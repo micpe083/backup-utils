@@ -1,20 +1,23 @@
 package backup.gui.explorer;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import backup.api.BackupUtil;
 import backup.api.FileInfo;
 
-public class FileInfoPanel extends JPanel
+public class FileInfoPanel extends BorderPane
 {
-    private static final long serialVersionUID = 413806726707465428L;
-
-    private final JLabel label = new JLabel();
+    private final TextField pathTextField;
 
     public FileInfoPanel()
     {
-        add(label);
+        final Label label = new Label("File info:");
+        setLeft(label);
+
+        pathTextField = new TextField("-");
+        pathTextField.setEditable(false);
+        setCenter(pathTextField);
 
         setFileInfo(null);
     }
@@ -40,6 +43,6 @@ public class FileInfoPanel extends JPanel
             buf.append(BackupUtil.humanReadableByteCount(fileInfo.getSize()));
         }
 
-        label.setText(buf.toString());
+        pathTextField.setText(buf.toString());
     }
 }

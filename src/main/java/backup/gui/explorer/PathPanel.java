@@ -1,27 +1,21 @@
 package backup.gui.explorer;
 
-import java.awt.BorderLayout;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-public class PathPanel extends JPanel
+public class PathPanel extends BorderPane
 {
-    private static final long serialVersionUID = 6522214165973532373L;
-
-    private final JTextField pathTextField;
+    private final TextField pathTextField;
 
     public PathPanel()
     {
-        super(new BorderLayout());
+        final Label label = new Label("Path:");
+        setLeft(label);
 
-        final JLabel label = new JLabel("Path:");
-        add(label, BorderLayout.WEST);
-
-        pathTextField = new JTextField("-");
+        pathTextField = new TextField("-");
         pathTextField.setEditable(false);
-        add(pathTextField, BorderLayout.CENTER);
+        setCenter(pathTextField);
     }
 
     public void setPath(final String path)

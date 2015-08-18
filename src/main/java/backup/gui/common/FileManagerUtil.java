@@ -9,8 +9,8 @@ public final class FileManagerUtil
 {
     private FileManagerUtil() {}
 
-    public static void asdf(final FileChooserPanel panel,
-                            final FileManager fileManager) throws IOException
+    public static void loadDigestFile(final FileChooserPanel panel,
+                                      final FileManager fileManager) throws IOException
     {
         final File digestFile = panel.getSelectionFile();
 

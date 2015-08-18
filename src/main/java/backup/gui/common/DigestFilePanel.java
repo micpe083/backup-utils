@@ -1,32 +1,19 @@
 package backup.gui.common;
 
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import backup.api.BackupUtil;
 import backup.api.FileManager;
 import backup.gui.explorer.FileExplorer;
 
-public class DigestFilePanel extends JPanel implements ActionListener
+public class DigestFilePanel extends VBox
 {
-    private static final long serialVersionUID = 3167744253202577782L;
-
     private final FileChooserPanel fileChooserDigestFile;
 
     private final FileManager fileManager = new FileManager();
 
     private final StatsPanel statsPanel = new StatsPanel();
-
-    private final JButton processButton;
-    private final JButton exploreButton;
-    private final JButton exploreDupsButton;
 
     public DigestFilePanel()
     {
@@ -35,30 +22,28 @@ public class DigestFilePanel extends JPanel implements ActionListener
 
     public DigestFilePanel(final String text)
     {
-        setLayout(new GridLayout(0, 1));
-
-        fileChooserDigestFile = new FileChooserPanel(text, JFileChooser.FILES_ONLY);
-        add(fileChooserDigestFile);
+        fileChooserDigestFile = new FileChooserPanel(text, true);
+        getChildren().add(fileChooserDigestFile);
 
         BackupUtil.setFile(fileChooserDigestFile);
 
-        add(statsPanel);
+        getChildren().add(statsPanel);
 
-        exploreDupsButton = new JButton("Explore Dups");
-        exploreDupsButton.addActionListener(this);
+        final Button exploreDupsButton = new Button("Explore Dups");
+        exploreDupsButton.setOnAction(e -> FileExplorer.show(fileManager.getFilesWithDups()));
 
-        exploreButton = new JButton("Explore All");
-        exploreButton.addActionListener(this);
+        final Button exploreButton = new Button("Explore All");
+        exploreButton.setOnAction(e -> FileExplorer.show(fileManager));
 
-        processButton = new JButton("Process File");
-        processButton.addActionListener(this);
+        final Button processButton = new Button("Process File");
+        processButton.setOnAction(e -> processFile());
 
-        final JPanel buttonPanel = new JPanel(new FlowLayout());
-        buttonPanel.add(exploreDupsButton);
-        buttonPanel.add(exploreButton);
-        buttonPanel.add(processButton);
+        final HBox buttonPanel = new HBox();
+        buttonPanel.getChildren().add(exploreDupsButton);
+        buttonPanel.getChildren().add(exploreButton);
+        buttonPanel.getChildren().add(processButton);
 
-        add(buttonPanel);
+        getChildren().add(buttonPanel);
     }
 
     public void setSelection(final String text)
@@ -75,33 +60,16 @@ public class DigestFilePanel extends JPanel implements ActionListener
     {
         try
         {
-            FileManagerUtil.asdf(fileChooserDigestFile, fileManager);
+            FileManagerUtil.loadDigestFile(fileChooserDigestFile, fileManager);
 
             statsPanel.setFileManager(fileManager);
         }
         catch (Exception e)
         {
-            JOptionPane.showMessageDialog(this,
-                                          "Failed to process directory: " + e.getMessage(),
-                                          "Error",
-                                          JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    @Override
-    public void actionPerformed(final ActionEvent e)
-    {
-        if (e.getSource() == processButton)
-        {
-            processFile();
-        }
-        else if (e.getSource() == exploreDupsButton)
-        {
-            FileExplorer.createAndShowGUI(fileManager.getFilesWithDups());
-        }
-        else if (e.getSource() == exploreButton)
-        {
-            FileExplorer.createAndShowGUI(fileManager);
+            GuiUtils.showErrorMessage(this,
+                                      "Failed to process directory: " + e.getMessage(),
+                                      "Error",
+                                      e);
         }
     }
 }

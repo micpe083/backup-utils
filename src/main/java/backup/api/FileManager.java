@@ -13,7 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import backup.api.DigestUtil.DigestAlg;
+import backup.api.FileSum.CountSize;
 
+/**
+ * @author Michael Peterson
+ *
+ * TODO: support all digest algorithms
+ */
 public class FileManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
@@ -53,15 +59,13 @@ public class FileManager
                 fileInfoPath.getPath());
     }
 
-    public FileSum[] getFileSum()
+    public FileSum getFileSum()
     {
-        long countTotal = 0;
-        long countUnique = 0;
-        long countDuplicate = 0;
+        final FileSum fileSum = new FileSum();
 
-        long sizeTotal = 0;
-        long sizeUnique = 0;
-        long sizeDuplicate = 0;
+        final CountSize total = fileSum.getTotal();
+        final CountSize unique = fileSum.getUnique();
+        final CountSize duplicate = fileSum.getDuplicate();
 
         for (final Entry<FileInfo, List<String>> entry : map.entrySet())
         {
@@ -72,22 +76,12 @@ public class FileManager
             final int ln = paths.size();
             final int dup = ln - 1;
 
-            countTotal += ln;
-            countDuplicate += dup;
-            countUnique += 1;
-
-            sizeTotal += ln * size;
-            sizeDuplicate += dup * size;
-            sizeUnique += size;
+            total.incr(ln, ln * size);
+            duplicate.incr(dup, dup * size);
+            unique.incr(1, size);
         }
 
-        final FileSum[] fileSums = new FileSum[]
-        {
-            FileSum.createCount(countTotal, countUnique, countDuplicate),
-            FileSum.createSize(sizeTotal, sizeUnique, sizeDuplicate),
-        };
-
-        return fileSums;
+        return fileSum;
     }
 
     public Map<FileInfo, List<String>> findDups()
@@ -130,10 +124,14 @@ public class FileManager
 
         for (final Entry<FileInfo, List<String>> entry : map.entrySet())
         {
-            final FileInfo fileInfo = entry.getKey();
             final List<String> paths = entry.getValue();
 
-            fileManager.map.put(fileInfo, paths);
+            if (paths.size() > 1)
+            {
+                final FileInfo fileInfo = entry.getKey();
+
+                fileManager.map.put(fileInfo, paths);
+            }
         }
 
         return fileManager;
