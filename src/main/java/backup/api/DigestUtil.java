@@ -8,7 +8,9 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +51,16 @@ public class DigestUtil
         {
             return name();
         }
+    }
+
+    public interface DigestProgressListener
+    {
+        void update(String message);
+
+        void update(String message,
+                    long currFileLen,
+                    long processedBytes,
+                    long totalSize);
     }
 
     private final DigestAlg digestAlg;
@@ -193,7 +205,8 @@ public class DigestUtil
     }
 
     public File createDigestFile(final File digestDir,
-                                 final File outputDir) throws IOException
+                                 final File outputDir,
+                                 final DigestProgressListener progress) throws IOException
     {
         validateDir(digestDir);
         validateDir(outputDir);
@@ -208,42 +221,45 @@ public class DigestUtil
 
         LOGGER.info("Writing digest file: " + outputFile);
 
+        progress.update("Calculating directory size");
+
+        final long totalDirectorySize = calcDirectorySize(digestPath);
+
+        progress.update("Starting directory digest",
+                        -1,
+                        0,
+                        totalDirectorySize);
+
+        final AtomicLong processedSize = new AtomicLong(0);
+
         try (final BufferedWriter writer = BackupUtil.createWriter(outputFile))
         {
-            final FileVisitor<Path> fileVisitor = new FileVisitor<Path>()
+            final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<Path>()
             {
                 @Override
-                public FileVisitResult postVisitDirectory(final Path dir,
-                                                          final IOException exc) throws IOException
-                {
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult preVisitDirectory(final Path dir,
-                                                         final BasicFileAttributes attrs) throws IOException
-                {
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(final Path file,
+                public FileVisitResult visitFile(final Path filePath,
                                                  final BasicFileAttributes attrs) throws IOException
                 {
-                    final FileInfo fileInfo = toFileInfo(file.toFile());
+                    final File file = filePath.toFile();
+
+                    final String sizeStr = BackupUtil.humanReadableByteCount(file.length());
+                    final String fileStr = file.getAbsolutePath() + " - " + sizeStr;
+
+                    progress.update("> " + fileStr,
+                                    file.length(),
+                                    processedSize.longValue(),
+                                    totalDirectorySize);
+
+                    final FileInfo fileInfo = toFileInfo(file);
 
                     final String fileInfoStr = toFileInfoStr(fileInfo);
 
                     LOGGER.info(fileInfoStr);
 
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFileFailed(final Path file,
-                                                       final IOException exc) throws IOException
-                {
-                    LOGGER.error("failed to process file: " + file, exc);
+                    progress.update("< " + fileStr,
+                                    file.length(),
+                                    processedSize.addAndGet(file.length()),
+                                    totalDirectorySize);
 
                     return FileVisitResult.CONTINUE;
                 }
@@ -253,5 +269,26 @@ public class DigestUtil
         }
 
         return outputFile;
+    }
+
+    private long calcDirectorySize(final Path digestPath) throws IOException
+    {
+        final AtomicLong totalSize = new AtomicLong(0);
+
+        final FileVisitor<Path> sizeCalculator = new SimpleFileVisitor<Path>()
+        {
+            @Override
+            public FileVisitResult visitFile(final Path file,
+                                             final BasicFileAttributes attrs) throws IOException
+            {
+                totalSize.addAndGet(file.toFile().length());
+
+                return FileVisitResult.CONTINUE;
+            }
+        };
+
+        Files.walkFileTree(digestPath, sizeCalculator);
+
+        return totalSize.longValue();
     }
 }
