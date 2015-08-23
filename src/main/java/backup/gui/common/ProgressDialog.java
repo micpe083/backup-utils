@@ -1,9 +1,5 @@
 package backup.gui.common;
 
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
-
 import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -13,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import backup.api.StopWatch;
 
 public class ProgressDialog
 {
@@ -22,8 +19,7 @@ public class ProgressDialog
     private final TextField timeTextField;
     private final TextField messageTextField;
 
-    private LocalTime startDate;
-    private LocalTime endDate;
+    private final StopWatch stopWatch = new StopWatch();
 
     public ProgressDialog(final Task<Void> task,
                           final String title,
@@ -93,48 +89,12 @@ public class ProgressDialog
 
     private void updateTime()
     {
-        final StringBuilder buf = new StringBuilder();
-
-        final LocalTime startDate = this.startDate;
-
-        if (startDate == null)
-        {
-            buf.append("Not started");
-        }
-        else
-        {
-            buf.append("Duration: ");
-
-            final Duration duration = Duration.between(startDate, LocalTime.now());
-
-            final long hours = duration.toHours();
-            final long minutes = duration.toMinutes() - 60 * duration.toHours();
-            final long seconds = duration.getSeconds() - 60 * duration.toMinutes();
-
-            buf.append(String.format("%02d", hours));
-            buf.append(":");
-            buf.append(String.format("%02d", minutes));
-            buf.append(":");
-            buf.append(String.format("%02d", seconds));
-            buf.append(" ");
-
-            buf.append("Start: ").append(startDate);
-            buf.append(" ");
-
-            final LocalTime endDate = this.endDate;
-            if (endDate != null)
-            {
-                endDate.truncatedTo(ChronoUnit.SECONDS);
-                buf.append("End: ").append(endDate);
-            }
-        }
-
-        timeTextField.setText(buf.toString());
+        timeTextField.setText(stopWatch.getDescription());
     }
 
     private void onFinished()
     {
-        endDate = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+        stopWatch.stop();
 
         updateTime();
 
@@ -150,7 +110,7 @@ public class ProgressDialog
 
     public void start()
     {
-        startDate = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+        stopWatch.start();
 
         updateTime();
 

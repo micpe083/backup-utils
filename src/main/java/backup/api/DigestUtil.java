@@ -3,6 +3,7 @@ package backup.api;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -258,6 +259,8 @@ public class DigestUtil
 
         validateDirs(digestDir, outputDir);
 
+        final StopWatch stopWatch = new StopWatch().start();
+
         final Path digestPath = Paths.get(digestDir.toURI());
 
         final String outputFilename = "out_" + BackupUtil.getFilenameTimestamp() + "_" + digestAlg.getName().toLowerCase() + "_" + digestDir.getName() + ".txt";
@@ -268,7 +271,9 @@ public class DigestUtil
 
         progress.update("Calculating directory size");
 
-        final long totalDirectorySize = calcDirectorySize(digestPath);
+        final AtomicLong fileCount = new AtomicLong(0);
+
+        final long totalDirectorySize = calcDirectorySize(digestPath, fileCount);
 
         progress.update("Starting directory digest",
                         -1,
@@ -279,6 +284,13 @@ public class DigestUtil
 
         try (final BufferedWriter writer = BackupUtil.createWriter(outputFile))
         {
+            writeInfo(writer,
+                      stopWatch,
+                      outputFile,
+                      digestDir,
+                      totalDirectorySize,
+                      fileCount);
+
             final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<Path>()
             {
                 @Override
@@ -301,8 +313,7 @@ public class DigestUtil
 
                     //LOGGER.info(fileInfoStr);
 
-                    writer.write(fileInfoStr);
-                    writer.write("\n");
+                    writeLine(writer, fileInfoStr, false);
 
                     progress.update("< " + fileStr,
                                     file.length(),
@@ -314,12 +325,58 @@ public class DigestUtil
             };
 
             Files.walkFileTree(digestPath, fileVisitor);
+
+            stopWatch.stop();
+
+            writeInfo(writer,
+                      stopWatch,
+                      outputFile,
+                      digestDir,
+                      totalDirectorySize,
+                      fileCount);
         }
 
         return outputFile;
     }
 
-    private long calcDirectorySize(final Path digestPath) throws IOException
+    private void writeInfo(final Writer writer,
+                           final StopWatch stopWatch,
+                           final File outputFile,
+                           final File digestDir,
+                           final long totalDirectorySize,
+                           final AtomicLong fileCount) throws IOException
+    {
+        writeLine(writer, "Started: " + stopWatch.getStartDate(), true);
+
+        if (stopWatch.isStopped())
+        {
+            writeLine(writer, "Finished: " + stopWatch.getEndDate(), true);
+        }
+
+        writeLine(writer, "Duration: " + stopWatch.getDuration(), true);
+
+        writeLine(writer, "Output path: " + outputFile.getAbsolutePath(), true);
+        writeLine(writer, "Output file: " + outputFile.getName(), true);
+        writeLine(writer, "Digest dir: " + digestDir.getAbsolutePath(), true);
+        writeLine(writer, "File count: " + fileCount, true);
+        writeLine(writer, "Directory size: " + BackupUtil.humanReadableByteCount(totalDirectorySize), true);
+    }
+
+    private void writeLine(final Writer writer,
+                           final String line,
+                           final boolean isComment) throws IOException
+    {
+        if (isComment)
+        {
+            writer.write("# ");
+        }
+
+        writer.write(line);
+        writer.write("\n");
+    }
+
+    private long calcDirectorySize(final Path digestPath,
+                                   final AtomicLong fileCount) throws IOException
     {
         final AtomicLong totalSize = new AtomicLong(0);
 
@@ -330,6 +387,8 @@ public class DigestUtil
                                              final BasicFileAttributes attrs) throws IOException
             {
                 totalSize.addAndGet(file.toFile().length());
+
+                fileCount.incrementAndGet();
 
                 return FileVisitResult.CONTINUE;
             }
