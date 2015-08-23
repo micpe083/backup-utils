@@ -36,29 +36,41 @@ public class FileChooserPanel extends BorderPane
         pathTextField.setText(text);
     }
 
-    public String getSelectionStr()
+    public String getSelectedFileStr()
     {
         return pathTextField.getText();
     }
 
-    public File getSelectionFile()
+    public File getSelectedFile()
     {
-        return new File(getSelectionStr());
+        return new File(getSelectedFileStr());
     }
 
     private void selectFile()
     {
         final File file;
 
+        final File selectedFile = getSelectedFile();
+
         if (isFile)
         {
             final FileChooser fileChooser = new FileChooser();
+
+            if (selectedFile.getParentFile().isDirectory())
+            {
+                fileChooser.setInitialDirectory(selectedFile.getParentFile());
+            }
 
             file = fileChooser.showOpenDialog(getScene().getWindow());
         }
         else
         {
             final DirectoryChooser fileChooser = new DirectoryChooser();
+
+            if (selectedFile.isDirectory())
+            {
+                fileChooser.setInitialDirectory(selectedFile);
+            }
 
             file = fileChooser.showDialog(getScene().getWindow());
         }

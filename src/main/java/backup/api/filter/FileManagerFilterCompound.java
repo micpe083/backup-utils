@@ -28,7 +28,7 @@ public class FileManagerFilterCompound implements FileManagerFilter
     public boolean accept(final FileInfo fileInfo,
                           final List<String> paths)
     {
-        boolean accept = false;
+        boolean accept = true;
 
         for (final FileManagerFilter filter : filters)
         {

@@ -1,6 +1,7 @@
 package backup.gui.filter;
 
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tooltip;
 import backup.api.filter.FileManagerFilter;
 import backup.api.filter.FileManagerFilterDups;
 
@@ -10,7 +11,8 @@ public class FilterItemPanelDups extends FilterItemPanel
 
     public FilterItemPanelDups()
     {
-        checkBoxDups = new CheckBox("Dups");
+        checkBoxDups = new CheckBox("Dups Only");
+        checkBoxDups.setTooltip(new Tooltip("Only show files with duplicates"));
 
         getChildren().add(checkBoxDups);
     }

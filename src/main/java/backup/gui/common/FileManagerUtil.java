@@ -12,7 +12,7 @@ public final class FileManagerUtil
     public static void loadDigestFile(final FileChooserPanel panel,
                                       final FileManager fileManager) throws IOException
     {
-        final File digestFile = panel.getSelectionFile();
+        final File digestFile = panel.getSelectedFile();
 
         fileManager.loadDigestFile(digestFile);
     }

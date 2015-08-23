@@ -41,6 +41,7 @@ public class BackupUtilsGui extends Application
 
         final Scene scene = new Scene(root, 800, 200);
 
+        primaryStage.setTitle("Backup Utils");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

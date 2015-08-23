@@ -3,10 +3,12 @@ package backup.gui.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.control.Button;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import backup.api.filter.FileManagerFilter;
 import backup.api.filter.FileManagerFilterCompound;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
 
 public class FilterPanel extends VBox
 {
@@ -21,17 +23,22 @@ public class FilterPanel extends VBox
 
     public FilterPanel()
     {
-        add(new FilterItemPanelName());
-        add(new FilterItemPanelSize());
-        add(new FilterItemPanelDups());
+        final FlowPane filterPane = new FlowPane();
+        add(filterPane, new FilterItemPanelSize());
+        add(filterPane, new FilterItemPanelName());
+        add(filterPane, new FilterItemPanelDups());
+        getChildren().add(filterPane);
 
+        final HBox hbox = new HBox();
         final Button filterButton = new Button("Filter");
         filterButton.setOnAction(x -> filter());
-        getChildren().add(filterButton);
+        hbox.getChildren().add(filterButton);
 
         final Button resetButton = new Button("Reset");
         resetButton.setOnAction(x -> reset());
-        getChildren().add(resetButton);
+        hbox.getChildren().add(resetButton);
+
+        getChildren().add(hbox);
     }
 
     public void setListener(final FilterListener listener)
@@ -69,9 +76,10 @@ public class FilterPanel extends VBox
         }
     }
 
-    private void add(final FilterItemPanel panel)
+    private void add(final FlowPane pane,
+                     final FilterItemPanel panel)
     {
         list.add(panel);
-        getChildren().add(panel);
+        pane.getChildren().add(panel);
     }
 }
