@@ -263,9 +263,10 @@ public class DigestUtil
 
         final Path digestPath = Paths.get(digestDir.toURI());
 
-        final String outputFilename = "out_" + BackupUtil.getFilenameTimestamp() + "_" + digestAlg.getName().toLowerCase() + "_" + digestDir.getName() + ".txt";
+        final String outputFilename = "out_" + BackupUtil.getFilenameTimestamp() + "_" + digestAlg.getName().toLowerCase() + "_" + digestDir.getName();
 
-        final File outputFile = new File(outputDir, outputFilename);
+        final File outputFile = new File(outputDir, outputFilename + ".txt");
+        final File outputFileErr = new File(outputDir, outputFilename + ".err.txt");
 
         LOGGER.info("Writing digest file: " + outputFile);
 
@@ -281,15 +282,21 @@ public class DigestUtil
                         totalDirectorySize);
 
         final AtomicLong processedSize = new AtomicLong(0);
+        final AtomicLong processedCount = new AtomicLong(0);
+        final AtomicLong errorCount = new AtomicLong(0);
 
-        try (final BufferedWriter writer = BackupUtil.createWriter(outputFile))
+        try (final BufferedWriter writer = BackupUtil.createWriter(outputFile);
+             final BufferedWriter writerErr = BackupUtil.createWriter(outputFileErr))
         {
             writeInfo(writer,
+                      writerErr,
                       stopWatch,
                       outputFile,
                       digestDir,
                       totalDirectorySize,
-                      fileCount);
+                      fileCount,
+                      processedCount,
+                      errorCount);
 
             final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<Path>()
             {
@@ -297,28 +304,48 @@ public class DigestUtil
                 public FileVisitResult visitFile(final Path filePath,
                                                  final BasicFileAttributes attrs) throws IOException
                 {
-                    final File file = filePath.toFile();
+                    try
+                    {
+                        final File file = filePath.toFile();
 
-                    final String sizeStr = BackupUtil.humanReadableByteCount(file.length());
-                    final String fileStr = file.getAbsolutePath() + " - " + sizeStr;
+                        final String sizeStr = BackupUtil.humanReadableByteCount(file.length());
+                        final String fileStr = file.getAbsolutePath() + " - " + sizeStr;
 
-                    progress.update("> " + fileStr,
-                                    file.length(),
-                                    processedSize.longValue(),
-                                    totalDirectorySize);
+                        progress.update("> " + fileStr,
+                                        file.length(),
+                                        processedSize.longValue(),
+                                        totalDirectorySize);
 
-                    final FileInfo fileInfo = toFileInfo(file);
+                        final FileInfo fileInfo = toFileInfo(file);
 
-                    final String fileInfoStr = toFileInfoStr(fileInfo);
+                        final String fileInfoStr = toFileInfoStr(fileInfo);
 
-                    //LOGGER.info(fileInfoStr);
+                        //LOGGER.info(fileInfoStr);
 
-                    writeLine(writer, fileInfoStr, false);
+                        writeLine(writer, fileInfoStr, false);
 
-                    progress.update("< " + fileStr,
-                                    file.length(),
-                                    processedSize.addAndGet(file.length()),
-                                    totalDirectorySize);
+                        progress.update("< " + fileStr,
+                                        file.length(),
+                                        processedSize.addAndGet(file.length()),
+                                        totalDirectorySize);
+
+                        processedCount.incrementAndGet();
+                    }
+                    catch (final IOException e)
+                    {
+                        visitFileFailed(filePath, e);
+                    }
+
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(final Path file,
+                                                       final IOException exc) throws IOException
+                {
+                    writeLine(writerErr, file + " - err: " + exc.getMessage(), false);
+
+                    errorCount.incrementAndGet();
 
                     return FileVisitResult.CONTINUE;
                 }
@@ -329,14 +356,46 @@ public class DigestUtil
             stopWatch.stop();
 
             writeInfo(writer,
+                      writerErr,
                       stopWatch,
                       outputFile,
                       digestDir,
                       totalDirectorySize,
-                      fileCount);
+                      fileCount,
+                      processedCount,
+                      errorCount);
         }
 
         return outputFile;
+    }
+
+    private void writeInfo(final Writer writer,
+                           final Writer writerErr,
+                           final StopWatch stopWatch,
+                           final File outputFile,
+                           final File digestDir,
+                           final long totalDirectorySize,
+                           final AtomicLong fileCount,
+                           final AtomicLong processedCount,
+                           final AtomicLong errorCount) throws IOException
+    {
+        writeInfo(writer,
+                  stopWatch,
+                  outputFile,
+                  digestDir,
+                  totalDirectorySize,
+                  fileCount,
+                  processedCount,
+                  errorCount);
+
+        writeInfo(writerErr,
+                  stopWatch,
+                  outputFile,
+                  digestDir,
+                  totalDirectorySize,
+                  fileCount,
+                  processedCount,
+                  errorCount);
     }
 
     private void writeInfo(final Writer writer,
@@ -344,7 +403,9 @@ public class DigestUtil
                            final File outputFile,
                            final File digestDir,
                            final long totalDirectorySize,
-                           final AtomicLong fileCount) throws IOException
+                           final AtomicLong fileCount,
+                           final AtomicLong processedCount,
+                           final AtomicLong errorCount) throws IOException
     {
         writeLine(writer, "Started: " + stopWatch.getStartDate(), true);
 
@@ -359,6 +420,8 @@ public class DigestUtil
         writeLine(writer, "Output file: " + outputFile.getName(), true);
         writeLine(writer, "Digest dir: " + digestDir.getAbsolutePath(), true);
         writeLine(writer, "File count: " + fileCount, true);
+        writeLine(writer, "Processed count: " + processedCount, true);
+        writeLine(writer, "Error count: " + errorCount, true);
         writeLine(writer, "Directory size: " + BackupUtil.humanReadableByteCount(totalDirectorySize), true);
     }
 
