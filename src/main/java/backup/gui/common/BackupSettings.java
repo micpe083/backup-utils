@@ -1,7 +1,12 @@
 package backup.gui.common;
 
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Properties;
+
+import backup.api.BackupUtil;
 
 public final class BackupSettings
 {
@@ -22,17 +27,19 @@ public final class BackupSettings
     {
         try
         {
-            properties.load(getFile().openStream());
+            load();
         }
         catch (final Exception e)
         {
-            throw new ExceptionInInitializerError(e);
+            // use empty settings if non found
         }
     }
 
-    private static URL getFile()
+    private static File getFile()
     {
-        return BackupSettings.class.getClassLoader().getResource("backup-utils.properties");
+        final File file = new File(BackupSettings.class.getClassLoader().getResource("backup-utils.properties").getFile());
+
+        return file;
     }
 
     public static synchronized BackupSettings getInstance()
@@ -45,8 +52,30 @@ public final class BackupSettings
         return instance;
     }
 
-    public String getString(final String key)
+    public void setValue(final String key,
+                         final String value)
+    {
+        properties.setProperty(key, value);
+    }
+
+    public String getValue(final String key)
     {
         return properties.getProperty(key);
+    }
+
+    public void load() throws IOException
+    {
+        try (final Reader reader = BackupUtil.createReader(getFile()))
+        {
+            properties.load(reader);
+        }
+    }
+
+    public void save() throws IOException
+    {
+        try (final Writer writer = BackupUtil.createWriter(getFile()))
+        {
+            properties.store(writer, "comments");
+        }
     }
 }

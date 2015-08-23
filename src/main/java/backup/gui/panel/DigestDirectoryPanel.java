@@ -28,10 +28,10 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
         final VBox pane = new VBox();
 
         fileChooserDigestDir = new FileChooserPanel("Digest dir:", false);
-        fileChooserDigestDir.setSelection(BackupSettings.getInstance().getString(BackupSettings.DIGEST_DIR));
+        fileChooserDigestDir.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_DIR));
 
         fileChooserOutputDir = new FileChooserPanel("Output dir", false);
-        fileChooserOutputDir.setSelection(BackupSettings.getInstance().getString(BackupSettings.DIGEST_OUTPUT_DIR));
+        fileChooserOutputDir.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_OUTPUT_DIR));
 
         digestSelectorPanel = new DigestSelectorPanel();
         pane.getChildren().add(digestSelectorPanel);

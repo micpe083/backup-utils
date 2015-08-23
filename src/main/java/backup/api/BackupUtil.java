@@ -72,6 +72,6 @@ public final class BackupUtil
 
     public static void setFile(final FileChooserPanel fileChooserDigestFile)
     {
-        fileChooserDigestFile.setSelection(BackupSettings.getInstance().getString(BackupSettings.DIGEST_FILE));
+        fileChooserDigestFile.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_FILE));
     }
 }

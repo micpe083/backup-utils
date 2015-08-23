@@ -15,9 +15,9 @@ public final class CopyScriptFactory
     public static void createCopyScript(final FileManager fileManager) throws IOException
     {
         createCopyScript(fileManager,
-                         BackupSettings.getInstance().getString(BackupSettings.COPY_SCRIPT_OUTPUT_DIR),
-                         BackupSettings.getInstance().getString(BackupSettings.COPY_SCRIPT_BASE_DIR_FROM),
-                         BackupSettings.getInstance().getString(BackupSettings.COPY_SCRIPT_BASE_DIR_TO));
+                         BackupSettings.getInstance().getValue(BackupSettings.COPY_SCRIPT_OUTPUT_DIR),
+                         BackupSettings.getInstance().getValue(BackupSettings.COPY_SCRIPT_BASE_DIR_FROM),
+                         BackupSettings.getInstance().getValue(BackupSettings.COPY_SCRIPT_BASE_DIR_TO));
     }
 
     public static File createCopyScript(final FileManager fileManager,

@@ -10,6 +10,7 @@ import backup.gui.panel.BackupUtilsPanel;
 import backup.gui.panel.ComparePanel;
 import backup.gui.panel.DigestDirectoryPanel;
 import backup.gui.panel.ExplorePanel;
+import backup.gui.panel.SettingsPanel;
 
 public class BackupUtilsGui extends Application
 {
@@ -35,6 +36,7 @@ public class BackupUtilsGui extends Application
         addTab(tabbedPane, new ExplorePanel());
         addTab(tabbedPane, new DigestDirectoryPanel());
         addTab(tabbedPane, new ComparePanel());
+        addTab(tabbedPane, new SettingsPanel());
 
         final BorderPane root = new BorderPane();
         root.setCenter(tabbedPane);
