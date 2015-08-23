@@ -10,6 +10,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
@@ -19,6 +20,7 @@ public class ProgressDialog
     private final Task<Void> task;
 
     private final TextField timeTextField;
+    private final TextField messageTextField;
 
     private LocalTime startDate;
     private LocalTime endDate;
@@ -29,7 +31,8 @@ public class ProgressDialog
     {
         this.task = task;
 
-        timeTextField = new TextField();
+        timeTextField = createTextField();
+
         dialog = new Dialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(text);
@@ -53,11 +56,10 @@ public class ProgressDialog
 
         progressBar.prefWidthProperty().bind(vbox.widthProperty().subtract(progressIndicator.widthProperty()));
 
-        final TextField textField = new TextField();
-        textField.setEditable(false);
+        messageTextField = createTextField();
 
         vbox.getChildren().add(progressPane);
-        vbox.getChildren().add(textField);
+        vbox.getChildren().add(messageTextField);
         vbox.getChildren().add(timeTextField);
 
         dialog.getDialogPane().setContent(vbox);
@@ -68,8 +70,8 @@ public class ProgressDialog
         progressIndicator.progressProperty().unbind();
         progressIndicator.progressProperty().bind(task.progressProperty());
 
-        textField.textProperty().unbind();
-        textField.textProperty().bind(task.messageProperty());
+        messageTextField.textProperty().unbind();
+        messageTextField.textProperty().bind(task.messageProperty());
 
         task.messageProperty().addListener(x -> updateTime());
 
@@ -79,6 +81,14 @@ public class ProgressDialog
         task.setOnFailed(x -> onFinished());
         //task.setOnCancelled(x -> );
         //task.setOnRunning(x -> );
+    }
+
+    private TextField createTextField()
+    {
+        final TextField textField = new TextField();
+        textField.setEditable(false);
+        textField.textProperty().addListener((x, y, z) -> textField.setTooltip(new Tooltip(z)));
+        return textField;
     }
 
     private void updateTime()

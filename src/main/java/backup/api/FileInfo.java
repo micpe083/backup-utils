@@ -1,15 +1,20 @@
 package backup.api;
 
+import backup.api.DigestUtil.DigestAlg;
+
+
 public final class FileInfo
 {
     private final String filename;
-    private final String hash;
+    private final String digest;
     private final long size;
 
-    public FileInfo(final String filename, final String hash, final long size)
+    public FileInfo(final String filename,
+                    final String hash,
+                    final long size)
     {
         this.filename = filename;
-        this.hash = hash;
+        this.digest = hash;
         this.size = size;
     }
 
@@ -20,12 +25,28 @@ public final class FileInfo
 
     public String getHash()
     {
-        return hash;
+        return digest;
     }
 
     public long getSize()
     {
         return size;
+    }
+
+    public DigestAlg getDigestAlg()
+    {
+        DigestAlg ret = null;
+
+        for (final DigestAlg digestAlg : DigestAlg.values())
+        {
+            if (digest.length() == digestAlg.getLen())
+            {
+                ret = digestAlg;
+                break;
+            }
+        }
+
+        return ret;
     }
 
     @Override
@@ -34,7 +55,7 @@ public final class FileInfo
         final int prime = 31;
         int result = 1;
         result = prime * result + ((filename == null) ? 0 : filename.hashCode());
-        result = prime * result + ((hash == null) ? 0 : hash.hashCode());
+        result = prime * result + ((digest == null) ? 0 : digest.hashCode());
         result = prime * result + (int) (size ^ (size >>> 32));
         return result;
     }
@@ -66,14 +87,14 @@ public final class FileInfo
         {
             return false;
         }
-        if (hash == null)
+        if (digest == null)
         {
-            if (other.hash != null)
+            if (other.digest != null)
             {
                 return false;
             }
         }
-        else if (!hash.equals(other.hash))
+        else if (!digest.equals(other.digest))
         {
             return false;
         }

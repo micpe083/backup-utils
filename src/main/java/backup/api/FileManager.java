@@ -12,21 +12,17 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backup.api.DigestUtil.DigestAlg;
 import backup.api.FileSum.CountSize;
 
 /**
  * @author Michael Peterson
  *
- * TODO: support all digest algorithms
  */
 public class FileManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
 
     private final Map<FileInfo, List<String>> map = new HashMap<FileInfo, List<String>>();
-
-    private final DigestUtil digestUtil = new DigestUtil(DigestAlg.MD5);
 
     public FileManager()
     {
@@ -49,14 +45,6 @@ public class FileManager
     public Map<FileInfo, List<String>> getMap()
     {
         return map;
-    }
-
-    public void addFile(final String fileInfoStr)
-    {
-        final FileInfoPath fileInfoPath = digestUtil.toFileInfo(fileInfoStr);
-
-        addFile(fileInfoPath.getFileInfo(),
-                fileInfoPath.getPath());
     }
 
     public FileSum getFileSum()
@@ -152,27 +140,6 @@ public class FileManager
         return fileManager;
     }
 
-    public void print()
-    {
-        print(map);
-    }
-
-    public void print(final Map<FileInfo, List<String>> map)
-    {
-        for (final Entry<FileInfo, List<String>> entry : map.entrySet())
-        {
-            final FileInfo fileInfo = entry.getKey();
-            final List<String> paths = entry.getValue();
-
-            LOGGER.info("### " + digestUtil.toFileInfoStr(fileInfo));
-
-            for (final String path : paths)
-            {
-                LOGGER.info("#      " + path);
-            }
-        }
-    }
-
     public FileManager getMissing(final FileManager other)
     {
         final FileManager ret = new FileManager();
@@ -181,8 +148,6 @@ public class FileManager
         ret.map.keySet().removeAll(other.map.keySet());
 
         LOGGER.info("missing files: " + ret.map.size());
-
-        print(ret.map);
 
         return ret;
     }
@@ -194,20 +159,28 @@ public class FileManager
 
     public void loadDigestFile(final File file) throws IOException
     {
-        // TODO: validate file exists
-
         clear();
 
         try (final BufferedReader reader = BackupUtil.createReader(file))
         {
             String line = null;
 
+            DigestUtil digestUtil = null;
+
             while ((line = reader.readLine()) != null)
             {
                 if (!line.isEmpty() &&
                     !line.startsWith("#"))
                 {
-                    addFile(line);
+                    if (digestUtil == null)
+                    {
+                        digestUtil = DigestUtil.createMatching(line);
+                    }
+
+                    final FileInfoPath fileInfoPath = digestUtil.toFileInfo(line);
+
+                    addFile(fileInfoPath.getFileInfo(),
+                            fileInfoPath.getPath());
                 }
             }
         }

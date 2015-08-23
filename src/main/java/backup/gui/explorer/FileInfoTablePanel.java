@@ -17,13 +17,13 @@ import backup.api.FileInfoPath;
 import backup.api.FileManager;
 import backup.gui.common.GuiUtils;
 
-public class PathsPanel extends BorderPane
+public class FileInfoTablePanel extends BorderPane
 {
     private final ObservableList<FileInfoPath> tableItems;
 
     private final Label label;
 
-    public PathsPanel()
+    public FileInfoTablePanel()
     {
         tableItems = FXCollections.observableArrayList();
 
@@ -39,10 +39,15 @@ public class PathsPanel extends BorderPane
         col2.prefWidthProperty().bind(tableView.widthProperty().multiply(0.1));
         tableView.getColumns().add(col2);
 
-        final TableColumn<FileInfoPath, String> col3 = new TableColumn<>("Digest");
-        col3.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getFileInfo().getHash()));
-        col3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
+        final TableColumn<FileInfoPath, String> col3 = new TableColumn<>("Alg");
+        col3.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getFileInfo().getDigestAlg().name()));
+        col3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.1));
         tableView.getColumns().add(col3);
+
+        final TableColumn<FileInfoPath, String> col4 = new TableColumn<>("Digest");
+        col4.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getFileInfo().getHash()));
+        col4.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
+        tableView.getColumns().add(col4);
 
         tableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         //pathList.setVisibleRowCount(4);

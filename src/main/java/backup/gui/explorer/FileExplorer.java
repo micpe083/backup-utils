@@ -12,7 +12,7 @@ import backup.gui.common.StatsPanel;
 public class FileExplorer extends BorderPane implements PathSelectionListener
 {
     private final PathPanel pathPanel;
-    private final PathsPanel pathsPanel;
+    private final FileInfoTablePanel pathsPanel;
 
     private final FileManager fileManager;
 
@@ -35,7 +35,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
         statsPanel.setFileManager(fileManager);
         vbox.getChildren().add(statsPanel);
 
-        pathsPanel = new PathsPanel();
+        pathsPanel = new FileInfoTablePanel();
         vbox.getChildren().add(pathsPanel);
 
         final HBox buttonPanel = new HBox();

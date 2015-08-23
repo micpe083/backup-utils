@@ -10,6 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,7 +77,32 @@ public class DigestUtil
         this.pattern = Pattern.compile(getRegex(digestAlg));
     }
 
-    private String getRegex(final DigestAlg digestAlg)
+    public static DigestUtil createMatching(final String fileInfoStr)
+    {
+        DigestUtil ret = null;
+
+        for (final DigestAlg digestAlg : DigestAlg.values())
+        {
+            final Pattern pattern = Pattern.compile(getRegex(digestAlg));
+
+            final Matcher matcher = pattern.matcher(fileInfoStr);
+
+            if (matcher.matches())
+            {
+                ret = new DigestUtil(digestAlg);
+                break;
+            }
+        }
+
+        if (ret == null)
+        {
+            throw new IllegalArgumentException("no matching digest alg found for: " + fileInfoStr);
+        }
+
+        return ret;
+    }
+
+    private static String getRegex(final DigestAlg digestAlg)
     {
         final String digestName = digestAlg.getName();
 
@@ -176,6 +204,23 @@ public class DigestUtil
         return fileInfo;
     }
 
+    public void print(final FileManager fileManager)
+    {
+        final Map<FileInfo, List<String>> map = fileManager.getMap();
+
+        for (final Entry<FileInfo, List<String>> entry : map.entrySet())
+        {
+            final FileInfo fileInfo = entry.getKey();
+            final List<String> paths = entry.getValue();
+
+            LOGGER.info("### " + toFileInfoStr(fileInfo));
+
+            for (final String path : paths)
+            {
+                LOGGER.info("#      " + path);
+            }
+        }
+    }
 
     private void validateDir(final File dir) throws IOException
     {
@@ -215,7 +260,7 @@ public class DigestUtil
 
         final Path digestPath = Paths.get(digestDir.toURI());
 
-        final String outputFilename = "out_" + digestAlg.getName().toLowerCase() + "_" + digestDir.getName() + "_" + BackupUtil.getFilenameTimestamp() + ".txt";
+        final String outputFilename = "out_" + BackupUtil.getFilenameTimestamp() + "_" + digestAlg.getName().toLowerCase() + "_" + digestDir.getName() + ".txt";
 
         final File outputFile = new File(outputDir, outputFilename);
 
@@ -254,7 +299,10 @@ public class DigestUtil
 
                     final String fileInfoStr = toFileInfoStr(fileInfo);
 
-                    LOGGER.info(fileInfoStr);
+                    //LOGGER.info(fileInfoStr);
+
+                    writer.write(fileInfoStr);
+                    writer.write("\n");
 
                     progress.update("< " + fileStr,
                                     file.length(),
