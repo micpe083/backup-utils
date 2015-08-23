@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import backup.api.FileSum.CountSize;
+import backup.api.filter.FileManagerFilter;
 
 /**
  * @author Michael Peterson
@@ -72,53 +73,25 @@ public class FileManager
         return fileSum;
     }
 
-    public Map<FileInfo, List<String>> findDups()
-    {
-        final Map<FileInfo, List<String>> ret = new HashMap<FileInfo, List<String>>();
-
-        for (final Entry<FileInfo, List<String>> entry : map.entrySet())
-        {
-            final FileInfo fileInfo = entry.getKey();
-            final List<String> paths = entry.getValue();
-
-            final boolean hasDups = paths.size() > 1;
-
-            if (hasDups)
-            {
-                ret.put(fileInfo,
-                        paths);
-            }
-        }
-
-        if (ret.isEmpty())
-        {
-            LOGGER.info("No duplicates found");
-        }
-        //else
-        //{
-        //    //count, size = get_file_sum (file_dict)
-        //    //f.write ('# Duplicate files found' + '\n')
-        //    //f.write ('# Count: ' + str(count) + '\n')
-        //    //f.write ('# Size (bytes): ' + str(size) + '\n')
-        //    //print_dict (ret, f)
-        //}
-
-        return ret;
-    }
-
-    public FileManager getFilesWithDups()
+    public FileManager getFileManager(final FileManagerFilter filter)
     {
         final FileManager fileManager = new FileManager();
 
-        for (final Entry<FileInfo, List<String>> entry : map.entrySet())
+        if (filter == null)
         {
-            final List<String> paths = entry.getValue();
-
-            if (paths.size() > 1)
+            fileManager.map.putAll(map);
+        }
+        else
+        {
+            for (final Entry<FileInfo, List<String>> entry : map.entrySet())
             {
                 final FileInfo fileInfo = entry.getKey();
+                final List<String> paths = entry.getValue();
 
-                fileManager.map.put(fileInfo, paths);
+                if (filter.accept(fileInfo, paths))
+                {
+                    fileManager.map.put(fileInfo, paths);
+                }
             }
         }
 

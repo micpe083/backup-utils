@@ -2,6 +2,7 @@ package backup.gui.common;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -39,6 +40,15 @@ public final class GuiUtils
         scrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
         return scrollPane;
+    }
+
+    public static TitledPane createTitledPane(final String title,
+                                              final Node content,
+                                              final boolean expanded)
+    {
+        final TitledPane titledPane = new TitledPane(title, content);
+        titledPane.setExpanded(expanded);
+        return titledPane;
     }
 
     public static void setBorder(final Node pane)

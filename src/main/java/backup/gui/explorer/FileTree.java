@@ -20,13 +20,14 @@ public class FileTree extends BorderPane
 {
     private final List<PathSelectionListener> listeners = new ArrayList<PathSelectionListener>();
 
+    private final TreeView<Object> tree;
     private final TreeItem<Object> root;
 
     public FileTree()
     {
         root = new TreeItem<Object>("/");
 
-        final TreeView<Object> tree = new TreeView<Object>(root);
+        tree = new TreeView<Object>(root);
         tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> treeItemSelected(newValue));
@@ -60,6 +61,8 @@ public class FileTree extends BorderPane
 
     public void setFileManager(final FileManager fileManager)
     {
+        root.getChildren().clear();
+
         for (final Entry<FileInfo, List<String>> entry : fileManager.getMap().entrySet())
         {
             final FileInfo fileInfo = entry.getKey();

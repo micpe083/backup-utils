@@ -29,17 +29,13 @@ public class DigestFilePanel extends VBox
 
         getChildren().add(statsPanel);
 
-        final Button exploreDupsButton = new Button("Explore Dups");
-        exploreDupsButton.setOnAction(e -> FileExplorer.show(fileManager.getFilesWithDups()));
-
-        final Button exploreButton = new Button("Explore All");
+        final Button exploreButton = new Button("Explore");
         exploreButton.setOnAction(e -> FileExplorer.show(fileManager));
 
         final Button processButton = new Button("Process File");
         processButton.setOnAction(e -> processFile());
 
         final HBox buttonPanel = new HBox();
-        buttonPanel.getChildren().add(exploreDupsButton);
         buttonPanel.getChildren().add(exploreButton);
         buttonPanel.getChildren().add(processButton);
 
