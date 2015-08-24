@@ -296,7 +296,8 @@ public class DigestUtil
                       totalDirectorySize,
                       fileCount,
                       processedCount,
-                      errorCount);
+                      errorCount,
+                      true);
 
             final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<Path>()
             {
@@ -363,7 +364,8 @@ public class DigestUtil
                       totalDirectorySize,
                       fileCount,
                       processedCount,
-                      errorCount);
+                      errorCount,
+                      false);
         }
 
         return outputFile;
@@ -377,7 +379,8 @@ public class DigestUtil
                            final long totalDirectorySize,
                            final AtomicLong fileCount,
                            final AtomicLong processedCount,
-                           final AtomicLong errorCount) throws IOException
+                           final AtomicLong errorCount,
+                           final boolean isHeader) throws IOException
     {
         writeInfo(writer,
                   stopWatch,
@@ -386,7 +389,8 @@ public class DigestUtil
                   totalDirectorySize,
                   fileCount,
                   processedCount,
-                  errorCount);
+                  errorCount,
+                  isHeader);
 
         writeInfo(writerErr,
                   stopWatch,
@@ -395,7 +399,8 @@ public class DigestUtil
                   totalDirectorySize,
                   fileCount,
                   processedCount,
-                  errorCount);
+                  errorCount,
+                  isHeader);
     }
 
     private void writeInfo(final Writer writer,
@@ -405,7 +410,8 @@ public class DigestUtil
                            final long totalDirectorySize,
                            final AtomicLong fileCount,
                            final AtomicLong processedCount,
-                           final AtomicLong errorCount) throws IOException
+                           final AtomicLong errorCount,
+                           final boolean isHeader) throws IOException
     {
         writeLine(writer, "Started: " + stopWatch.getStartDate(), true);
 
@@ -415,13 +421,17 @@ public class DigestUtil
         }
 
         writeLine(writer, "Duration: " + stopWatch.getDuration(), true);
-
         writeLine(writer, "Output path: " + outputFile.getAbsolutePath(), true);
         writeLine(writer, "Output file: " + outputFile.getName(), true);
         writeLine(writer, "Digest dir: " + digestDir.getAbsolutePath(), true);
         writeLine(writer, "File count: " + fileCount, true);
         writeLine(writer, "Processed count: " + processedCount, true);
-        writeLine(writer, "Error count: " + errorCount, true);
+
+        if (!isHeader)
+        {
+            writeLine(writer, "Error count: " + errorCount, true);
+        }
+
         writeLine(writer, "Directory size: " + BackupUtil.humanReadableByteCount(totalDirectorySize), true);
     }
 

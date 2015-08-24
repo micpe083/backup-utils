@@ -1,10 +1,10 @@
 package backup.gui.explorer;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -20,14 +20,16 @@ public class FileTree extends BorderPane
 {
     private final List<PathSelectionListener> listeners = new ArrayList<PathSelectionListener>();
 
-    private final TreeView<Object> tree;
-    private final TreeItem<Object> root;
+    private static final Pattern PATH_PATTERN = Pattern.compile("\\\\|/");
+
+    private final TreeView<FileTreeNode> tree;
+    private final TreeItem<FileTreeNode> root;
 
     public FileTree()
     {
-        root = new TreeItem<Object>("/");
+        root = new TreeItem<>(new FileTreeNode("/", "/"));
 
-        tree = new TreeView<Object>(root);
+        tree = new TreeView<>(root);
         tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> treeItemSelected(newValue));
@@ -86,7 +88,7 @@ public class FileTree extends BorderPane
         }
     }
 
-    private void expandAll(final TreeItem<Object> treeItem,
+    private void expandAll(final TreeItem<FileTreeNode> treeItem,
                            final boolean isExpand)
     {
         if (treeItem == null)
@@ -96,7 +98,7 @@ public class FileTree extends BorderPane
 
         treeItem.setExpanded(isExpand);
 
-        for (final TreeItem<Object> currTreeItem : treeItem.getChildren())
+        for (final TreeItem<FileTreeNode> currTreeItem : treeItem.getChildren())
         {
             currTreeItem.setExpanded(isExpand);
 
@@ -106,35 +108,32 @@ public class FileTree extends BorderPane
 
     private void addFile(final FileInfo fileInfo, final String filePath)
     {
-        final List<String> list = new ArrayList<String>();
+        TreeItem<FileTreeNode> currParent = this.root;
 
-        File file = new File(filePath).getParentFile();
-        do
+        final Matcher matcher = PATH_PATTERN.matcher(filePath);
+
+        int startPos = 0;
+        while (matcher.find())
         {
-            final String name = file.getName();
+            final int endPos = matcher.start();
 
-            if (name != null && name.length() != 0)
+            final String pathElement = filePath.substring(startPos, endPos);
+            startPos = matcher.end();
+
+            if (pathElement.isEmpty())
             {
-                list.add(name);
+                continue;
             }
 
-            file = file.getParentFile();
-        }
-        while (file != null);
+            final String fullPath = filePath.substring(0, endPos);
 
-        Collections.reverse(list);
+            TreeItem<FileTreeNode> currChild = null;
 
-        TreeItem<Object> currParent = this.root;
-
-        for (final String nodeStr : list)
-        {
-            TreeItem<Object> currChild = null;
-
-            for (final TreeItem<Object> testChild : currParent.getChildren())
+            for (final TreeItem<FileTreeNode> testChild : currParent.getChildren())
             {
-                final Object obj = testChild.getValue();
+                final FileTreeNode obj = testChild.getValue();
 
-                if (nodeStr.equals(obj))
+                if (pathElement.equals(obj.getName()))
                 {
                     currChild = testChild;
                     break;
@@ -143,82 +142,77 @@ public class FileTree extends BorderPane
 
             if (currChild == null)
             {
-                currChild = new TreeItem<Object>(nodeStr);
+                final FileTreeNode node = new FileTreeNode(fullPath,
+                                                           pathElement);
 
-                currParent.getChildren().add(currChild);
+                currChild = addChild(currParent, node);
             }
 
             currParent = currChild;
         }
 
-        currParent.getChildren().add(new TreeItem<Object>(new FileInfoNode(fileInfo)));
+        final FileTreeNode node = new FileTreeNode(fileInfo,
+                                                   filePath,
+                                                   fileInfo.getFilename());
+
+        addChild(currParent, node);
     }
 
-    private void treeItemSelected(final TreeItem<Object> selectedTreeItem)
+    private TreeItem<FileTreeNode> addChild(final TreeItem<FileTreeNode> parent,
+                                            final FileTreeNode node)
+    {
+        final TreeItem<FileTreeNode> child = new TreeItem<>(node);
+
+        parent.getChildren().add(child);
+
+        return child;
+    }
+
+    private void treeItemSelected(final TreeItem<FileTreeNode> selectedTreeItem)
     {
         if (selectedTreeItem == null)
         {
             return;
         }
 
-        FileInfo fileInfo = null;
-
-        TreeItem<Object> curr = selectedTreeItem;
-
-        final List<String> pathList = new ArrayList<>();
-
-        do
-        {
-            final Object obj = curr.getValue();
-
-            if (obj instanceof String)
-            {
-                final String pathElement = (String) obj;
-                pathList.add(pathElement);
-            }
-            else if (obj instanceof FileInfoNode)
-            {
-                final FileInfoNode fileInfoNode = (FileInfoNode) obj;
-                fileInfo = fileInfoNode.getFileInfo();
-            }
-
-            curr = curr.getParent();
-        }
-        while (curr != null);
-
-        Collections.reverse(pathList);
-
-        final StringBuilder buf = new StringBuilder();
-
-        for (final String pathElement : pathList)
-        {
-            buf.append(pathElement);
-            buf.append("/");
-        }
-
-        if (fileInfo != null)
-        {
-            buf.append(fileInfo.getFilename());
-        }
-
-        notifyListeners(fileInfo, buf.toString());
+        notifyListeners(selectedTreeItem.getValue().getFileInfo(),
+                        selectedTreeItem.getValue().getFullPath());
     }
 
-    private static final class FileInfoNode
+    private static final class FileTreeNode
     {
         private final FileInfo fileInfo;
-
+        private final String fullPath;
         private final String name;
 
-        public FileInfoNode(final FileInfo fileInfo)
+        public FileTreeNode(final String fullPath,
+                            final String name)
+        {
+            this(null, fullPath, name);
+        }
+
+        public FileTreeNode(final FileInfo fileInfo,
+                            final String fullPath,
+                            final String name)
         {
             this.fileInfo = fileInfo;
-            this.name = new File(fileInfo.getFilename()).getName();
+            this.fullPath = fullPath;
+            this.name = name;
         }
 
         public FileInfo getFileInfo()
         {
             return fileInfo;
+        }
+
+        public String getFullPath()
+        {
+            return fullPath;
+        }
+
+        public String getName()
+        {
+            return name;
         }
 
         @Override
