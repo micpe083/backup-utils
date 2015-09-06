@@ -63,11 +63,27 @@ public class FileInfoTablePanel extends BorderPane
         setFileInfo(null, null);
     }
 
+    public void addFiles(final FileManager fileManager)
+    {
+        tableItems.clear();
+
+        for (final FileInfo fileInfo : fileManager.getMap().keySet())
+        {
+            addFile(fileManager, fileInfo);
+        }
+    }
+
     public void setFileInfo(final FileManager fileManager,
                             final FileInfo fileInfo)
     {
         tableItems.clear();
 
+        addFile(fileManager, fileInfo);
+    }
+
+    public void addFile(final FileManager fileManager,
+                        final FileInfo fileInfo)
+    {
         if (fileManager == null ||
             fileInfo == null)
         {

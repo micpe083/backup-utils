@@ -1,6 +1,7 @@
 package backup.gui.explorer;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -17,7 +18,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
     private final PathPanel pathPanel;
     private final FileInfoTablePanel pathsPanel;
     private final StatsPanel statsPanel;
-    private final FileTree fileTree;
+    private FileViewer fileViewer;
 
     private final FileManager fileManagerOrig;
     private FileManager fileManagerFiltered;
@@ -25,11 +26,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
     public FileExplorer(final FileManager fileManager)
     {
         this.fileManagerOrig = fileManager;
-
-        fileTree = new FileTree();
-        fileTree.addListener(this);
-
-        setCenter(fileTree);
+        this.fileManagerFiltered = fileManager;
 
         final VBox vbox = new VBox();
 
@@ -47,13 +44,46 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
         vbox.getChildren().add(GuiUtils.createTitledPane("Filters", filterPanel, false));
 
         final HBox buttonPanel = new HBox();
-        buttonPanel.getChildren().add(fileTree.createExpandAllButton());
-        buttonPanel.getChildren().add(fileTree.createCollapseAllButton());
+        final Button treeButton = new Button("Tree View");
+        treeButton.setOnAction(x -> setFileView(true));
+        buttonPanel.getChildren().add(treeButton);
+
+        final Button listButton = new Button("List View");
+        listButton.setOnAction(x -> setFileView(false));
+        buttonPanel.getChildren().add(listButton);
         vbox.getChildren().add(buttonPanel);
 
         setBottom(vbox);
 
-        setFileManager(fileManager);
+        setFileView(true);
+    }
+
+    private void setFileView(final boolean b)
+    {
+        final FileViewer fileViewerOld = this.fileViewer;
+
+        if (fileViewerOld != null)
+        {
+            fileViewerOld.removeListener(this);
+        }
+
+        final FileViewer fileViewerNew;
+
+        if (b)
+        {
+            fileViewerNew = new FileViewerTree();
+        }
+        else
+        {
+            fileViewerNew = new FileViewerList();
+        }
+
+        fileViewerNew.addListener(this);
+        centerProperty().set(fileViewerNew);
+
+        this.fileViewer = fileViewerNew;
+
+        setFileManager(fileManagerFiltered);
     }
 
     private void filter(final FileManagerFilter filter)
@@ -66,7 +96,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
     private void setFileManager(final FileManager fileManager)
     {
         this.fileManagerFiltered = fileManager;
-        fileTree.setFileManager(fileManager);
+        fileViewer.setFileManager(fileManager);
         statsPanel.setFileManager(fileManager);
         fileSelected(null, null);
     }

@@ -1,5 +1,7 @@
 package backup.gui.common;
 
+import java.awt.Toolkit;
+
 import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -96,10 +98,9 @@ public class ProgressDialog
     private void onFinished()
     {
         stopWatch.stop();
-
         updateTime();
-
         setButtonState(false, true);
+        Toolkit.getDefaultToolkit().beep();
     }
 
     private void setButtonState(final boolean ok,

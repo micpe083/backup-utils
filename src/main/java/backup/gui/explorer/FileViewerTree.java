@@ -1,6 +1,5 @@
 package backup.gui.explorer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -11,21 +10,19 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import backup.api.FileInfo;
 import backup.api.FileManager;
 import backup.gui.common.GuiUtils;
 
-public class FileTree extends BorderPane
+public class FileViewerTree extends FileViewer
 {
-    private final List<PathSelectionListener> listeners = new ArrayList<PathSelectionListener>();
-
     private static final Pattern PATH_PATTERN = Pattern.compile("\\\\|/");
 
     private final TreeView<FileTreeNode> tree;
     private final TreeItem<FileTreeNode> root;
 
-    public FileTree()
+    public FileViewerTree()
     {
         root = new TreeItem<>(new FileTreeNode("x", "x"));
 
@@ -38,28 +35,18 @@ public class FileTree extends BorderPane
         final ScrollPane scrollPane = GuiUtils.createScrollPane(tree);
 
         setCenter(scrollPane);
-    }
 
-    public Button createExpandAllButton()
-    {
+        final HBox buttonPanel = new HBox();
+
         final Button expandAllButton = new Button("Expand All");
         expandAllButton.setOnAction(e -> expandAll(root, true));
-        return expandAllButton;
-    }
+        buttonPanel.getChildren().add(expandAllButton);
 
-    public Button createCollapseAllButton()
-    {
         final Button collapseAllButton = new Button("Collapse All");
         collapseAllButton.setOnAction(e -> expandAll(root, false));
-        return collapseAllButton;
-    }
+        buttonPanel.getChildren().add(collapseAllButton);
 
-    public void addListener(final PathSelectionListener l)
-    {
-        synchronized (listeners)
-        {
-            listeners.add(l);
-        }
+        setBottom(buttonPanel);
     }
 
     public void setFileManager(final FileManager fileManager)
@@ -74,17 +61,6 @@ public class FileTree extends BorderPane
             for (final String string : paths)
             {
                 addFile(fileInfo, string);
-            }
-        }
-    }
-
-    private void notifyListeners(final FileInfo fileInfo, final String path)
-    {
-        synchronized (listeners)
-        {
-            for (final PathSelectionListener pathSelectionListener : listeners)
-            {
-                pathSelectionListener.fileSelected(fileInfo, path);
             }
         }
     }
