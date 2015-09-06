@@ -120,7 +120,7 @@ public class DigestUtil
         buf.append(" (");
         buf.append(fileInfo.getFilename());
         buf.append(") = ");
-        buf.append(fileInfo.getHash());
+        buf.append(fileInfo.getDigest());
         buf.append(" ");
         buf.append(fileInfo.getSize());
 

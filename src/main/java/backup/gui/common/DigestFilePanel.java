@@ -3,7 +3,6 @@ package backup.gui.common;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import backup.api.BackupUtil;
 import backup.api.FileManager;
 import backup.gui.explorer.FileExplorer;
 
@@ -25,7 +24,7 @@ public class DigestFilePanel extends VBox
         fileChooserDigestFile = new FileChooserPanel(text, true);
         getChildren().add(fileChooserDigestFile);
 
-        BackupUtil.setFile(fileChooserDigestFile);
+        GuiUtils.setFile(fileChooserDigestFile);
 
         getChildren().add(statsPanel);
 

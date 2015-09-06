@@ -32,6 +32,7 @@ public class ProgressDialog
         dialog = new Dialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(text);
+        dialog.setResizable(true);
 
         //dialog.setGraphic(new ImageView(this.getClass().getResource("icon.png").toString()));
 

@@ -27,9 +27,10 @@ public class FileTree extends BorderPane
 
     public FileTree()
     {
-        root = new TreeItem<>(new FileTreeNode("/", "/"));
+        root = new TreeItem<>(new FileTreeNode("x", "x"));
 
         tree = new TreeView<>(root);
+        tree.showRootProperty().set(false);
         tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> treeItemSelected(newValue));
@@ -112,36 +113,37 @@ public class FileTree extends BorderPane
 
         final Matcher matcher = PATH_PATTERN.matcher(filePath);
 
+        boolean pathExists = true;
         int startPos = 0;
         while (matcher.find())
         {
             final int endPos = matcher.start();
 
-            final String pathElement = filePath.substring(startPos, endPos);
+            final String pathElement = startPos == endPos ? "/" : filePath.substring(startPos, endPos);
             startPos = matcher.end();
 
-            if (pathElement.isEmpty())
-            {
-                continue;
-            }
-
-            final String fullPath = filePath.substring(0, endPos);
+            final String fullPath = filePath.substring(0, startPos);
 
             TreeItem<FileTreeNode> currChild = null;
 
-            for (final TreeItem<FileTreeNode> testChild : currParent.getChildren())
+            if (pathExists)
             {
-                final FileTreeNode obj = testChild.getValue();
-
-                if (pathElement.equals(obj.getName()))
+                for (final TreeItem<FileTreeNode> testChild : currParent.getChildren())
                 {
-                    currChild = testChild;
-                    break;
+                    final FileTreeNode node = testChild.getValue();
+
+                    if (pathElement.equals(node.getName()))
+                    {
+                        currChild = testChild;
+                        break;
+                    }
                 }
             }
 
             if (currChild == null)
             {
+                pathExists = false;
+
                 final FileTreeNode node = new FileTreeNode(fullPath,
                                                            pathElement);
 

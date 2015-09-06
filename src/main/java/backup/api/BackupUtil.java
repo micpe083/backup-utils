@@ -14,9 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import backup.gui.common.BackupSettings;
-import backup.gui.common.FileChooserPanel;
-
 public final class BackupUtil
 {
     private static final String CHARSET_UTF8 = "UTF-8";
@@ -37,6 +34,29 @@ public final class BackupUtil
         final InputStreamReader isr = new InputStreamReader(fis, BackupUtil.CHARSET_UTF8);
         final BufferedReader reader = new BufferedReader(isr);
         return reader;
+    }
+
+    public static String findCommonPath(final String path1,
+                                        final String path2)
+    {
+        int idx = -1;
+        for (int i = 0; i < Math.min(path1.length(), path2.length()); i++)
+        {
+            final char c1 = path1.charAt(i);
+            final char c2 = path2.charAt(i);
+
+            if (c1 == '\\' || c1 == '/')
+            {
+                idx = i;
+            }
+
+            if (c1 != c2)
+            {
+                break;
+            }
+        }
+
+        return path1.substring(0, idx + 1);
     }
 
     public static String getFilenameTimestamp()
@@ -68,10 +88,5 @@ public final class BackupUtil
         final String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
 
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-    }
-
-    public static void setFile(final FileChooserPanel fileChooserDigestFile)
-    {
-        fileChooserDigestFile.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_FILE));
     }
 }

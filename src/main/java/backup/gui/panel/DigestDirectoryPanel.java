@@ -2,6 +2,7 @@ package backup.gui.panel;
 
 import java.io.File;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
@@ -10,6 +11,7 @@ import backup.api.BackupUtil;
 import backup.api.DigestUtil;
 import backup.api.DigestUtil.DigestAlg;
 import backup.api.DigestUtil.DigestProgressListener;
+import backup.api.StopWatch;
 import backup.gui.common.BackupSettings;
 import backup.gui.common.DigestSelectorPanel;
 import backup.gui.common.FileChooserPanel;
@@ -112,6 +114,8 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
             {
                 final DigestUtil digestUtil = new DigestUtil(digestAlg);
 
+                final long startTime = System.currentTimeMillis();
+
                 final DigestProgressListener listener = new DigestProgressListener()
                 {
                     @Override
@@ -132,6 +136,20 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
                         }
 
                         final StringBuilder buf = new StringBuilder();
+
+                        if (totalSize > 0)
+                        {
+                            final double pcCompleted = processedBytes / (double) totalSize;
+                            final long timeElapsed = System.currentTimeMillis() - startTime;
+                            final long timeRemaining = Math.round(timeElapsed / pcCompleted) - timeElapsed;
+                            final long bytesPerSec = Math.round(processedBytes / (double) TimeUnit.SECONDS.convert(timeElapsed, TimeUnit.MILLISECONDS));
+
+                            buf.append("Remaining: ").append(StopWatch.getDuration(timeRemaining));
+                            buf.append(" / ");
+
+                            buf.append(BackupUtil.humanReadableByteCount(bytesPerSec)).append("/s");
+                            buf.append(" / ");
+                        }
 
                         if (currFileLen >= 0)
                         {

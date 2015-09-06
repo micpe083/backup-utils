@@ -60,4 +60,9 @@ public final class GuiUtils
 
         pane.setStyle(cssDefault);
     }
+
+    public static void setFile(final FileChooserPanel fileChooserDigestFile)
+    {
+        fileChooserDigestFile.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_FILE));
+    }
 }

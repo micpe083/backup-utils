@@ -10,11 +10,11 @@ public final class FileInfo
     private final long size;
 
     public FileInfo(final String filename,
-                    final String hash,
+                    final String digest,
                     final long size)
     {
         this.filename = filename;
-        this.digest = hash;
+        this.digest = digest;
         this.size = size;
     }
 
@@ -23,7 +23,7 @@ public final class FileInfo
         return filename;
     }
 
-    public String getHash()
+    public String getDigest()
     {
         return digest;
     }

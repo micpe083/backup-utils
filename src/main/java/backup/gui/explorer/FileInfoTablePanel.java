@@ -45,7 +45,7 @@ public class FileInfoTablePanel extends BorderPane
         tableView.getColumns().add(col3);
 
         final TableColumn<FileInfoPath, String> col4 = new TableColumn<>("Digest");
-        col4.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getFileInfo().getHash()));
+        col4.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getFileInfo().getDigest()));
         col4.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
         tableView.getColumns().add(col4);
 

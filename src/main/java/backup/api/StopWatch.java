@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class StopWatch
 {
@@ -72,18 +73,33 @@ public class StopWatch
 
             final Duration duration = Duration.between(startTime, endTime);
 
-            final long hours = duration.toHours();
-            final long minutes = duration.toMinutes() - 60 * duration.toHours();
-            final long seconds = duration.getSeconds() - 60 * duration.toMinutes();
-
-            buf.append(String.format("%02d", hours));
-            buf.append(":");
-            buf.append(String.format("%02d", minutes));
-            buf.append(":");
-            buf.append(String.format("%02d", seconds));
+            addDuration(buf, duration.toMillis());
         }
 
         return buf.toString();
+    }
+
+    public static String getDuration(final long duration)
+    {
+        final StringBuilder buf = new StringBuilder();
+
+        addDuration(buf, duration);
+
+        return buf.toString();
+    }
+
+    private static void addDuration(final StringBuilder buf,
+                                    final long duration)
+    {
+        final long hours = TimeUnit.HOURS.convert(duration, TimeUnit.MILLISECONDS);
+        final long minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS) - 60 * TimeUnit.HOURS.convert(duration, TimeUnit.MILLISECONDS);
+        final long seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS) - 60 * TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS);
+
+        buf.append(String.format("%02d", hours));
+        buf.append(":");
+        buf.append(String.format("%02d", minutes));
+        buf.append(":");
+        buf.append(String.format("%02d", seconds));
     }
 
     public String getDescription()
