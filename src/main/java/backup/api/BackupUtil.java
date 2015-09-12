@@ -13,6 +13,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public final class BackupUtil
 {
@@ -72,6 +73,32 @@ public final class BackupUtil
     public static String humanReadableByteCount(final long bytes)
     {
         return humanReadableByteCount(bytes, true);
+    }
+
+    public static String getSizeAll(final long bytes)
+    {
+        return humanReadableByteCount(bytes, true) + " " +
+               humanReadableByteCount(bytes, false) + " " +
+               formatNumber(bytes) + " B";
+    }
+
+    public static String getSpeed(final long bytes,
+                                  final long timeElapsed)
+    {
+        final String ret;
+
+        if (timeElapsed > 0)
+        {
+            final long bytesPerSec = Math.round(bytes / (double) TimeUnit.SECONDS.convert(timeElapsed, TimeUnit.MILLISECONDS));
+
+            ret = BackupUtil.humanReadableByteCount(bytesPerSec) + "/s";
+        }
+        else
+        {
+            ret = "?";
+        }
+
+        return ret;
     }
 
     private static String humanReadableByteCount(final long bytes,

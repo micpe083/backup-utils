@@ -296,6 +296,7 @@ public class DigestUtil
                       totalDirectorySize,
                       fileCount,
                       processedCount,
+                      processedSize,
                       errorCount,
                       true);
 
@@ -364,6 +365,7 @@ public class DigestUtil
                       totalDirectorySize,
                       fileCount,
                       processedCount,
+                      processedSize,
                       errorCount,
                       false);
         }
@@ -379,6 +381,7 @@ public class DigestUtil
                            final long totalDirectorySize,
                            final AtomicLong fileCount,
                            final AtomicLong processedCount,
+                           final AtomicLong processedSize,
                            final AtomicLong errorCount,
                            final boolean isHeader) throws IOException
     {
@@ -389,6 +392,7 @@ public class DigestUtil
                   totalDirectorySize,
                   fileCount,
                   processedCount,
+                  processedSize,
                   errorCount,
                   isHeader);
 
@@ -399,6 +403,7 @@ public class DigestUtil
                   totalDirectorySize,
                   fileCount,
                   processedCount,
+                  processedSize,
                   errorCount,
                   isHeader);
     }
@@ -410,6 +415,7 @@ public class DigestUtil
                            final long totalDirectorySize,
                            final AtomicLong fileCount,
                            final AtomicLong processedCount,
+                           final AtomicLong processedSize,
                            final AtomicLong errorCount,
                            final boolean isHeader) throws IOException
     {
@@ -418,21 +424,22 @@ public class DigestUtil
         if (stopWatch.isStopped())
         {
             writeLine(writer, "Finished: " + stopWatch.getEndDate(), true);
+            writeLine(writer, "Avg. Speed: " + BackupUtil.getSpeed(processedSize.longValue(), stopWatch.getDurationMillis()), true);
         }
 
         writeLine(writer, "Duration: " + stopWatch.getDuration(), true);
         writeLine(writer, "Output path: " + outputFile.getAbsolutePath(), true);
         writeLine(writer, "Output file: " + outputFile.getName(), true);
         writeLine(writer, "Digest dir: " + digestDir.getAbsolutePath(), true);
-        writeLine(writer, "File count: " + fileCount, true);
-        writeLine(writer, "Processed count: " + processedCount, true);
+        writeLine(writer, "File count: " + BackupUtil.formatNumber(fileCount.longValue()), true);
+        writeLine(writer, "Processed count: " + BackupUtil.formatNumber(processedCount.longValue()), true);
 
         if (!isHeader)
         {
-            writeLine(writer, "Error count: " + errorCount, true);
+            writeLine(writer, "Error count: " + BackupUtil.formatNumber(errorCount.longValue()), true);
         }
 
-        writeLine(writer, "Directory size: " + BackupUtil.humanReadableByteCount(totalDirectorySize), true);
+        writeLine(writer, "Directory size: " + BackupUtil.getSizeAll(totalDirectorySize), true);
     }
 
     private void writeLine(final Writer writer,
@@ -462,6 +469,15 @@ public class DigestUtil
                 totalSize.addAndGet(file.toFile().length());
 
                 fileCount.incrementAndGet();
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(final Path file,
+                                                   final IOException exc) throws IOException
+            {
+                LOGGER.error("dir size calc error: " + file, exc);
 
                 return FileVisitResult.CONTINUE;
             }

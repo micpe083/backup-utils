@@ -50,6 +50,14 @@ public class StopWatch
         return format(endDate);
     }
 
+    public long getDurationMillis()
+    {
+        final Date startDate = this.startDate;
+        final Date endDate = this.endDate;
+
+        return startDate != null && endDate != null ? endDate.getTime() - startDate.getTime() : 0;
+    }
+
     private String format(final Date date)
     {
         final String ret = date == null ? "Not set" : dateFormat.format(date);

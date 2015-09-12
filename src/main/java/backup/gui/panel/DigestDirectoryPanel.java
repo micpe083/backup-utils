@@ -2,7 +2,6 @@ package backup.gui.panel;
 
 import java.io.File;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.TimeUnit;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
@@ -112,6 +111,21 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
             @Override
             protected Void call() throws Exception
             {
+                try
+                {
+                    callx();
+                }
+                catch (Exception e)
+                {
+                    LOGGER.error("error processing", e);
+                    throw e;
+                }
+
+                return null;
+            }
+
+            private void callx() throws Exception
+            {
                 final DigestUtil digestUtil = new DigestUtil(digestAlg);
 
                 final long startTime = System.currentTimeMillis();
@@ -142,12 +156,11 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
                             final double pcCompleted = processedBytes / (double) totalSize;
                             final long timeElapsed = System.currentTimeMillis() - startTime;
                             final long timeRemaining = Math.round(timeElapsed / pcCompleted) - timeElapsed;
-                            final long bytesPerSec = Math.round(processedBytes / (double) TimeUnit.SECONDS.convert(timeElapsed, TimeUnit.MILLISECONDS));
 
                             buf.append("Remaining: ").append(StopWatch.getDuration(timeRemaining));
                             buf.append(" / ");
 
-                            buf.append(BackupUtil.humanReadableByteCount(bytesPerSec)).append("/s");
+                            buf.append(BackupUtil.getSpeed(processedBytes, timeElapsed));
                             buf.append(" / ");
                         }
 
@@ -172,8 +185,6 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
                 digestUtil.createDigestFile(digestDir,
                                             outputDir,
                                             listener);
-
-                return null;
             }
         };
     }
