@@ -2,6 +2,8 @@ package backup.gui.common;
 
 import java.io.File;
 
+import com.google.common.base.Strings;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -38,7 +40,7 @@ public class FileChooserPanel extends BorderPane
 
     public String getSelectedFileStr()
     {
-        return pathTextField.getText();
+        return Strings.nullToEmpty(pathTextField.getText());
     }
 
     public File getSelectedFile()
