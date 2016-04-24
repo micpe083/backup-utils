@@ -32,6 +32,10 @@ public class FileChooserComboPanel extends FileChooserAbstract
         final Button fileButton = new Button("File");
         fileButton.setOnAction(e -> selectFile(true));
 
+        final Button viewButton = new Button("V");
+        viewButton.setTooltip(new Tooltip("View File"));
+        viewButton.setOnAction(e -> viewFile());
+
         final Button refreshButton = new Button("R");
         refreshButton.setTooltip(new Tooltip("Refresh"));
         refreshButton.setOnAction(e -> refresh());
@@ -43,7 +47,18 @@ public class FileChooserComboPanel extends FileChooserAbstract
         buttonPane.getChildren().add(dirButton);
         buttonPane.getChildren().add(fileButton);
         buttonPane.getChildren().add(refreshButton);
+        buttonPane.getChildren().add(viewButton);
         setRight(buttonPane);
+    }
+
+    private void viewFile()
+    {
+        final File file = getSelectedFileWarn();
+
+        if (file != null)
+        {
+            FileViewer.view(file, this);
+        }
     }
 
     public void setSelection(final File file)
@@ -86,10 +101,10 @@ public class FileChooserComboPanel extends FileChooserAbstract
         {
             fileComboBox.getSelectionModel().select(select);
         }
-        else if (!fileList.isEmpty())
-        {
-            fileComboBox.getSelectionModel().select(fileList.get(0));
-        }
+        //else if (!fileList.isEmpty())
+        //{
+        //    fileComboBox.getSelectionModel().select(fileList.get(0));
+        //}
     }
 
     protected String getSelectedFileStr2()
