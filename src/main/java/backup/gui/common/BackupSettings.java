@@ -11,8 +11,8 @@ import backup.api.BackupUtil;
 public final class BackupSettings
 {
     public static final String DIGEST_FILE = "digest.file";
-
     public static final String DIGEST_DIR = "digest.dir";
+
     public static final String DIGEST_OUTPUT_DIR = "digest.output.dir";
 
     public static final String COPY_SCRIPT_BASE_DIR_FROM = "copy.script.base.dir.from";
@@ -35,13 +35,6 @@ public final class BackupSettings
         }
     }
 
-    private static File getFile()
-    {
-        final File file = new File(BackupSettings.class.getClassLoader().getResource("backup-utils.properties").getFile());
-
-        return file;
-    }
-
     public static synchronized BackupSettings getInstance()
     {
         if (instance == null)
@@ -50,6 +43,11 @@ public final class BackupSettings
         }
 
         return instance;
+    }
+
+    public String getOutputDir() throws IOException
+    {
+        return getDir(DIGEST_OUTPUT_DIR, "digest-output");
     }
 
     public void setValue(final String key,
@@ -65,7 +63,7 @@ public final class BackupSettings
 
     public void load() throws IOException
     {
-        try (final Reader reader = BackupUtil.createReader(getFile()))
+        try (final Reader reader = BackupUtil.createReader(getConfigFile()))
         {
             properties.load(reader);
         }
@@ -73,9 +71,62 @@ public final class BackupSettings
 
     public void save() throws IOException
     {
-        try (final Writer writer = BackupUtil.createWriter(getFile()))
+        try (final Writer writer = BackupUtil.createWriter(getConfigFile()))
         {
             properties.store(writer, "comments");
+        }
+    }
+
+    private String getDir(final String property,
+                          final String defaultDir) throws IOException
+    {
+        final String dirx = getValue(property);
+
+        final File dir;
+
+        if (dirx == null)
+        {
+            final File baseDir = getBaseDir();
+            dir = new File(baseDir, defaultDir);
+        }
+        else
+        {
+            dir = new File(dirx).getCanonicalFile();
+        }
+
+        checkDir(dir);
+
+        return dir.getCanonicalPath();
+    }
+
+    private static File getConfigFile() throws IOException
+    {
+        final File configFile = new File(getBaseDir(), "backup-utils.properties");
+
+        if (!configFile.exists())
+        {
+            configFile.createNewFile();
+        }
+
+        return configFile;
+    }
+
+    private static File getBaseDir() throws IOException
+    {
+        final String baseDirStr = System.getProperty("base.dir", ".");
+
+        final File baseDir = new File(baseDirStr).getCanonicalFile();
+
+        checkDir(baseDir);
+
+        return baseDir;
+    }
+
+    private static void checkDir(final File dir)
+    {
+        if (!dir.isDirectory())
+        {
+            dir.mkdir();
         }
     }
 }

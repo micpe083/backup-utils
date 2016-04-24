@@ -22,11 +22,11 @@ bin/
 *~
 
 # ignore eclipse files
-.classpath
-.project
+#.classpath
+#.project
 
 /logs/
 
 /.settings
 
-/*.launch
+#/*.launch

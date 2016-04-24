@@ -5,7 +5,7 @@ import backup.gui.settings.SettingsItemPanel;
 
 public class SettingsPanel extends BackupUtilsPanel
 {
-    public SettingsPanel()
+    public SettingsPanel() throws Exception
     {
         setCenter(new SettingsItemPanel());
     }

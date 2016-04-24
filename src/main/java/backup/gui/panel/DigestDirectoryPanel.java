@@ -3,9 +3,6 @@ package backup.gui.panel;
 import java.io.File;
 import java.util.concurrent.CancellationException;
 
-import javafx.concurrent.Task;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
 import backup.api.BackupUtil;
 import backup.api.DigestUtil;
 import backup.api.DigestUtil.DigestAlg;
@@ -16,6 +13,9 @@ import backup.gui.common.DigestSelectorPanel;
 import backup.gui.common.FileChooserPanel;
 import backup.gui.common.GuiUtils;
 import backup.gui.common.ProgressDialog;
+import javafx.concurrent.Task;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
 
 public class DigestDirectoryPanel extends BackupUtilsPanel
 {
@@ -24,7 +24,7 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
 
     private final DigestSelectorPanel digestSelectorPanel;
 
-    public DigestDirectoryPanel()
+    public DigestDirectoryPanel() throws Exception
     {
         final VBox pane = new VBox();
 
@@ -32,7 +32,7 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
         fileChooserDigestDir.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_DIR));
 
         fileChooserOutputDir = new FileChooserPanel("Output dir", false);
-        fileChooserOutputDir.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_OUTPUT_DIR));
+        fileChooserOutputDir.setSelection(BackupSettings.getInstance().getOutputDir());
 
         digestSelectorPanel = new DigestSelectorPanel();
         pane.getChildren().add(digestSelectorPanel);

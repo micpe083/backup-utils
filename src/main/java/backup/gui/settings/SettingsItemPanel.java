@@ -3,21 +3,21 @@ package backup.gui.settings;
 import java.util.ArrayList;
 import java.util.List;
 
+import backup.gui.common.BackupSettings;
+import backup.gui.common.GuiUtils;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import backup.gui.common.BackupSettings;
-import backup.gui.common.GuiUtils;
 
 public class SettingsItemPanel extends VBox
 {
     private final List<SettingsItem> list = new ArrayList<>();
 
-    public SettingsItemPanel()
+    public SettingsItemPanel() throws Exception
     {
         addPanel(new SettingsItemFile(BackupSettings.DIGEST_FILE, "Digest File", true));
         addPanel(new SettingsItemFile(BackupSettings.DIGEST_DIR, "Digest Dir", false));
-        addPanel(new SettingsItemFile(BackupSettings.DIGEST_OUTPUT_DIR, "Output Dir", false));
+        addPanel(new SettingsItemFile(BackupSettings.getInstance().getOutputDir(), "Output Dir", false));
 
         final HBox buttonPanel = new HBox();
 
