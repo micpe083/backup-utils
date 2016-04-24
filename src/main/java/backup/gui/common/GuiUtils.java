@@ -1,14 +1,21 @@
 package backup.gui.common;
 
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import java.io.File;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.TitledPane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 public final class GuiUtils
 {
@@ -21,7 +28,15 @@ public final class GuiUtils
                                         final String title,
                                         final Exception e)
     {
-        LOGGER.error(e.getMessage(), e);
+        final StringBuilder buf = new StringBuilder();
+        buf.append(title).append(" - ").append(message);
+
+        if (e != null)
+        {
+            buf.append(" - err: ").append(e.getMessage());
+        }
+
+        LOGGER.error(buf.toString(), e);
 
         final Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(title);
@@ -61,8 +76,65 @@ public final class GuiUtils
         pane.setStyle(cssDefault);
     }
 
-    public static void setFile(final FileChooserPanel fileChooserDigestFile)
+    public static String getSelectedFileStr(final String selectedFileStr)
     {
-        fileChooserDigestFile.setSelection(BackupSettings.getInstance().getValue(BackupSettings.DIGEST_FILE));
+        return Strings.isNullOrEmpty(selectedFileStr) ? null : selectedFileStr;
+    }
+
+    public static File getSelectedFile(final String selectedFileStr)
+    {
+        return Strings.isNullOrEmpty(selectedFileStr) ? null : new File(selectedFileStr);
+    }
+
+    public static void setFile(final FileChooserComboPanel fileChooserDigestFile) throws Exception
+    {
+        fileChooserDigestFile.setSelection(BackupSettings.getInstance().getOutputDir());
+    }
+
+    public static File getFile(final File file,
+                               final String descr,
+                               final Node node) throws Exception
+    {
+        if (file == null)
+        {
+            GuiUtils.showErrorMessage(node,
+                                      descr + " not selected",
+                                      "Error",
+                                      null);
+        }
+
+        return file;
+    }
+
+    public static File selectFile(final boolean isFile,
+                                  final File selectedFile,
+                                  final Scene scene)
+    {
+        final File file;
+
+        if (isFile)
+        {
+            final FileChooser fileChooser = new FileChooser();
+
+            if (selectedFile != null && selectedFile.getParentFile().isDirectory())
+            {
+                fileChooser.setInitialDirectory(selectedFile.getParentFile());
+            }
+
+            file = fileChooser.showOpenDialog(scene.getWindow());
+        }
+        else
+        {
+            final DirectoryChooser fileChooser = new DirectoryChooser();
+
+            if (selectedFile != null && selectedFile.isDirectory())
+            {
+                fileChooser.setInitialDirectory(selectedFile);
+            }
+
+            file = fileChooser.showDialog(scene.getWindow());
+        }
+
+        return file;
     }
 }

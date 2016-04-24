@@ -9,11 +9,14 @@ public final class FileManagerUtil
 {
     private FileManagerUtil() {}
 
-    public static void loadDigestFile(final FileChooserPanel panel,
+    public static void loadDigestFile(final FileChooserComboPanel panel,
                                       final FileManager fileManager) throws IOException
     {
-        final File digestFile = panel.getSelectedFile();
+        final File digestFile = panel.getSelectedFileWarn();
 
-        fileManager.loadDigestFile(digestFile);
+        if (digestFile != null)
+        {
+            fileManager.loadDigestFile(digestFile);
+        }
     }
 }

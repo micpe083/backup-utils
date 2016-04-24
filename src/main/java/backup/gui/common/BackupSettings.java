@@ -10,7 +10,6 @@ import backup.api.BackupUtil;
 
 public final class BackupSettings
 {
-    public static final String DIGEST_FILE = "digest.file";
     public static final String DIGEST_DIR = "digest.dir";
 
     public static final String DIGEST_OUTPUT_DIR = "digest.output.dir";

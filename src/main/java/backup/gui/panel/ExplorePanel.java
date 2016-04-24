@@ -11,7 +11,7 @@ import backup.gui.common.DigestFilePanel;
  */
 public class ExplorePanel extends BackupUtilsPanel
 {
-    public ExplorePanel()
+    public ExplorePanel() throws Exception
     {
         final DigestFilePanel digestFilePanel = new DigestFilePanel();
         setCenter(digestFilePanel);

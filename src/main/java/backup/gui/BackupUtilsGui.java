@@ -1,16 +1,15 @@
 package backup.gui;
 
+import backup.gui.panel.BackupUtilsPanel;
+import backup.gui.panel.ComparePanel;
+import backup.gui.panel.DigestDirectoryPanel;
+import backup.gui.panel.ExplorePanel;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import backup.gui.panel.BackupUtilsPanel;
-import backup.gui.panel.ComparePanel;
-import backup.gui.panel.DigestDirectoryPanel;
-import backup.gui.panel.ExplorePanel;
-import backup.gui.panel.SettingsPanel;
 
 public class BackupUtilsGui extends Application
 {
@@ -36,7 +35,7 @@ public class BackupUtilsGui extends Application
         addTab(tabbedPane, new ExplorePanel());
         addTab(tabbedPane, new DigestDirectoryPanel());
         addTab(tabbedPane, new ComparePanel());
-        addTab(tabbedPane, new SettingsPanel());
+        //addTab(tabbedPane, new SettingsPanel());
 
         final BorderPane root = new BorderPane();
         root.setCenter(tabbedPane);

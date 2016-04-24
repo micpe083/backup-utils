@@ -9,7 +9,7 @@ import backup.gui.explorer.FileExplorer;
 
 public class ComparePanel extends BackupUtilsPanel
 {
-    public ComparePanel()
+    public ComparePanel() throws Exception
     {
         final VBox vbox = new VBox();
 

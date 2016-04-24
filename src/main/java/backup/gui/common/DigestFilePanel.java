@@ -1,31 +1,30 @@
 package backup.gui.common;
 
+import backup.api.FileManager;
+import backup.gui.explorer.FileExplorer;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import backup.api.FileManager;
-import backup.gui.explorer.FileExplorer;
 
 public class DigestFilePanel extends VBox
 {
-    private final FileChooserPanel fileChooserDigestFile;
+    private final FileChooserComboPanel fileChooserDigestFile;
 
     private final FileManager fileManager = new FileManager();
 
     private final StatsPanel statsPanel = new StatsPanel();
 
-    public DigestFilePanel()
+    public DigestFilePanel() throws Exception
     {
         this("Digest file:");
     }
 
-    public DigestFilePanel(final String text)
+    public DigestFilePanel(final String text) throws Exception
     {
-        fileChooserDigestFile = new FileChooserPanel(text, true);
-        getChildren().add(fileChooserDigestFile);
-
+        fileChooserDigestFile = new FileChooserComboPanel(text);
         GuiUtils.setFile(fileChooserDigestFile);
 
+        getChildren().add(fileChooserDigestFile);
         getChildren().add(statsPanel);
 
         final Button exploreButton = new Button("Explore");

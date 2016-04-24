@@ -2,16 +2,11 @@ package backup.gui.common;
 
 import java.io.File;
 
-import com.google.common.base.Strings;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 
-public class FileChooserPanel extends BorderPane
+public class FileChooserPanel extends FileChooserAbstract
 {
     private final TextField pathTextField;
 
@@ -20,6 +15,8 @@ public class FileChooserPanel extends BorderPane
     public FileChooserPanel(final String labelText,
                             final boolean isFile)
     {
+        super(labelText);
+
         this.isFile = isFile;
 
         final Label label = new Label(labelText);
@@ -33,49 +30,23 @@ public class FileChooserPanel extends BorderPane
         setRight(browseButton);
     }
 
-    public void setSelection(final String text)
+    public void setSelection(final File file)
     {
-        pathTextField.setText(text);
+        pathTextField.setText(file == null ? "" : file.getAbsolutePath());
     }
 
-    public String getSelectedFileStr()
+    protected String getSelectedFileStr2()
     {
-        return Strings.nullToEmpty(pathTextField.getText());
-    }
-
-    public File getSelectedFile()
-    {
-        return new File(getSelectedFileStr());
+        return pathTextField.getText();
     }
 
     private void selectFile()
     {
-        final File file;
-
         final File selectedFile = getSelectedFile();
 
-        if (isFile)
-        {
-            final FileChooser fileChooser = new FileChooser();
-
-            if (selectedFile.getParentFile().isDirectory())
-            {
-                fileChooser.setInitialDirectory(selectedFile.getParentFile());
-            }
-
-            file = fileChooser.showOpenDialog(getScene().getWindow());
-        }
-        else
-        {
-            final DirectoryChooser fileChooser = new DirectoryChooser();
-
-            if (selectedFile.isDirectory())
-            {
-                fileChooser.setInitialDirectory(selectedFile);
-            }
-
-            file = fileChooser.showDialog(getScene().getWindow());
-        }
+        final File file = GuiUtils.selectFile(isFile,
+                                              selectedFile,
+                                              getScene());
 
         if (file != null)
         {

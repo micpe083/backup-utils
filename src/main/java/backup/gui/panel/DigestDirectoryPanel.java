@@ -57,8 +57,13 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
     {
         try
         {
-            final File digestDir = fileChooserDigestDir.getSelectedFile();
-            final File outputDir = fileChooserOutputDir.getSelectedFile();
+            final File digestDir = fileChooserDigestDir.getSelectedFileWarn();
+            final File outputDir = fileChooserOutputDir.getSelectedFileWarn();
+
+            if (digestDir == null || outputDir == null)
+            {
+                return;
+            }
 
             final DigestAlg digestAlg = digestSelectorPanel.getDigestAlg();
 
