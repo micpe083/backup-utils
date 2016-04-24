@@ -23,11 +23,13 @@ public class FileInfoTablePanel extends BorderPane
 
     private final Label label;
 
+    private final TableView<FileInfoPath> tableView;
+
     public FileInfoTablePanel()
     {
         tableItems = FXCollections.observableArrayList();
 
-        final TableView<FileInfoPath> tableView = new TableView<>(tableItems);
+        tableView = new TableView<>(tableItems);
 
         final TableColumn<FileInfoPath, String> col1 = new TableColumn<>("Path");
         col1.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getPath()));
@@ -61,6 +63,11 @@ public class FileInfoTablePanel extends BorderPane
         setBottom(label);
 
         setFileInfo(null, null);
+    }
+
+    public TableView<FileInfoPath> getTableView()
+    {
+        return tableView;
     }
 
     public void addFiles(final FileManager fileManager)

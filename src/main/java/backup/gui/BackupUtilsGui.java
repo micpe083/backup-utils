@@ -40,7 +40,7 @@ public class BackupUtilsGui extends Application
         final BorderPane root = new BorderPane();
         root.setCenter(tabbedPane);
 
-        final Scene scene = new Scene(root, 800, 200);
+        final Scene scene = new Scene(root, 800, 250);
 
         primaryStage.setTitle("Backup Utils");
         primaryStage.setScene(scene);

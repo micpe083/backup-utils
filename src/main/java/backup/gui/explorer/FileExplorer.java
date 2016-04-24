@@ -58,7 +58,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
         setFileView(true);
     }
 
-    private void setFileView(final boolean b)
+    private void setFileView(final boolean isTree)
     {
         final FileViewer fileViewerOld = this.fileViewer;
 
@@ -69,7 +69,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
 
         final FileViewer fileViewerNew;
 
-        if (b)
+        if (isTree)
         {
             fileViewerNew = new FileViewerTree();
         }
