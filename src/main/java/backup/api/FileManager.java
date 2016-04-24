@@ -3,6 +3,7 @@ package backup.api;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -157,5 +158,32 @@ public class FileManager
                 }
             }
         }
+    }
+
+    public Path getBaseDir()
+    {
+        File commonDir = null;
+
+        for (final Entry<FileInfo, List<String>> entry : map.entrySet())
+        {
+            final List<String> paths = entry.getValue();
+
+            for (final String path : paths)
+            {
+                final File currFile = new File(path);
+                final File currDir = currFile.getParentFile();
+
+                if (commonDir == null)
+                {
+                    commonDir = currDir;
+                }
+                else if (commonDir.toPath().startsWith(currDir.toPath()))
+                {
+                    commonDir = currDir;
+                }
+            }
+        }
+
+        return commonDir == null ? null : commonDir.toPath();
     }
 }

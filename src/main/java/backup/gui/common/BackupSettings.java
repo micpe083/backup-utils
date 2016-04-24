@@ -13,6 +13,7 @@ public final class BackupSettings
     public static final String DIGEST_DIR = "digest.dir";
 
     public static final String DIGEST_OUTPUT_DIR = "digest.output.dir";
+    public static final String STAGING_DIR = "staging.dir";
 
     public static final String COPY_SCRIPT_BASE_DIR_FROM = "copy.script.base.dir.from";
     public static final String COPY_SCRIPT_BASE_DIR_TO = "copy.script.base.dir.to";
@@ -47,6 +48,11 @@ public final class BackupSettings
     public String getOutputDir() throws IOException
     {
         return getDir(DIGEST_OUTPUT_DIR, "digest-output");
+    }
+
+    public String getStagingDir() throws IOException
+    {
+        return getDir(STAGING_DIR, "staging");
     }
 
     public void setValue(final String key,

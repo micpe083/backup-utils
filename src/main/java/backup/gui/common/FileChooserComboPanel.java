@@ -24,6 +24,7 @@ public class FileChooserComboPanel extends FileChooserAbstract
 
         fileList = FXCollections.observableArrayList();
         fileComboBox = new ComboBox<>(fileList);
+        fileComboBox.valueProperty().addListener((x, y, z) -> fileComboBox.setTooltip(new Tooltip(z)));
 
         final Button dirButton = new Button("Dir");
         dirButton.setOnAction(e -> selectFile(false));
@@ -79,6 +80,7 @@ public class FileChooserComboPanel extends FileChooserAbstract
         }
 
         FXCollections.sort(fileList);
+        FXCollections.reverse(fileList);
 
         if (select != null)
         {
