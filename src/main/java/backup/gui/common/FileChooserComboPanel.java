@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 public class FileChooserComboPanel extends FileChooserAbstract
@@ -30,12 +31,17 @@ public class FileChooserComboPanel extends FileChooserAbstract
         final Button fileButton = new Button("File");
         fileButton.setOnAction(e -> selectFile(true));
 
+        final Button refreshButton = new Button("R");
+        refreshButton.setTooltip(new Tooltip("Refresh"));
+        refreshButton.setOnAction(e -> refresh());
+
         setLeft(label);
         setCenter(fileComboBox);
 
         final HBox buttonPane = new HBox();
         buttonPane.getChildren().add(dirButton);
         buttonPane.getChildren().add(fileButton);
+        buttonPane.getChildren().add(refreshButton);
         setRight(buttonPane);
     }
 
@@ -72,6 +78,8 @@ public class FileChooserComboPanel extends FileChooserAbstract
             fileList.add(currFile.getAbsolutePath());
         }
 
+        FXCollections.sort(fileList);
+
         if (select != null)
         {
             fileComboBox.getSelectionModel().select(select);
@@ -85,6 +93,11 @@ public class FileChooserComboPanel extends FileChooserAbstract
     protected String getSelectedFileStr2()
     {
         return fileComboBox.getSelectionModel().getSelectedItem();
+    }
+
+    private void refresh()
+    {
+        setSelection(getSelectedFile());
     }
 
     private void selectFile(final boolean isFile)
