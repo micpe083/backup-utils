@@ -89,9 +89,14 @@ public class FileChooserComboPanel extends FileChooserAbstract
             throw new IllegalArgumentException("file doesn't exist: " + file);
         }
 
-        for (final File currFile : dir.listFiles())
+        final File[] files = dir == null ? null : dir.listFiles();
+
+        if (files != null)
         {
-            fileList.add(currFile.getAbsolutePath());
+            for (final File currFile : files)
+            {
+                fileList.add(currFile.getAbsolutePath());
+            }
         }
 
         FXCollections.sort(fileList);

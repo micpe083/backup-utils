@@ -12,14 +12,14 @@ public class FileViewerList extends FileViewer
     {
         this.table = new FileInfoTablePanel();
         setCenter(table);
-        
+
         table.getTableView().getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> onSelect(newSelection));
     }
 
-    private void onSelect(final FileInfoPath newSelection)
+    private void onSelect(final FileInfoPath fileInfoPath)
     {
-        final FileInfo fileInfo = newSelection == null ? null : newSelection.getFileInfo();
-        final String path = newSelection == null ? null : newSelection.getPath();
+        final FileInfo fileInfo = fileInfoPath == null ? null : fileInfoPath.getFileInfo();
+        final String path = fileInfoPath == null ? null : fileInfoPath.getPath();
 
         notifyListeners(fileInfo,
                         path);

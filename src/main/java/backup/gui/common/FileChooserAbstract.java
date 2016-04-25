@@ -10,7 +10,7 @@ public abstract class FileChooserAbstract extends BorderPane
 {
     private final String labelText;
 
-    public FileChooserAbstract(String labelText)
+    public FileChooserAbstract(final String labelText)
     {
         this.labelText = labelText;
     }

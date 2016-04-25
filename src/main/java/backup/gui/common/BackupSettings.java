@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import backup.api.BackupUtil;
@@ -15,9 +16,9 @@ public final class BackupSettings
     public static final String DIGEST_OUTPUT_DIR = "digest.output.dir";
     public static final String STAGING_DIR = "staging.dir";
 
-    public static final String COPY_SCRIPT_BASE_DIR_FROM = "copy.script.base.dir.from";
-    public static final String COPY_SCRIPT_BASE_DIR_TO = "copy.script.base.dir.to";
-    public static final String COPY_SCRIPT_OUTPUT_DIR = "copy.script.base.dir.output";
+    //public static final String COPY_SCRIPT_BASE_DIR_FROM = "copy.script.base.dir.from";
+    //public static final String COPY_SCRIPT_BASE_DIR_TO = "copy.script.base.dir.to";
+    //public static final String COPY_SCRIPT_OUTPUT_DIR = "copy.script.base.dir.output";
 
     private static BackupSettings instance;
 
@@ -110,7 +111,7 @@ public final class BackupSettings
 
         if (!configFile.exists())
         {
-            configFile.createNewFile();
+            Files.createFile(configFile.toPath());
         }
 
         return configFile;
@@ -118,20 +119,25 @@ public final class BackupSettings
 
     private static File getBaseDir() throws IOException
     {
-        final String baseDirStr = System.getProperty("base.dir", ".");
+        String baseDirStr = System.getProperty("base.dir");
 
-        final File baseDir = new File(baseDirStr).getCanonicalFile();
+        if (baseDirStr == null)
+        {
+            baseDirStr = System.getProperty("user.home");
+        }
+
+        final File baseDir = new File(baseDirStr, "backup-utils").getCanonicalFile();
 
         checkDir(baseDir);
 
         return baseDir;
     }
 
-    private static void checkDir(final File dir)
+    private static void checkDir(final File dir) throws IOException
     {
         if (!dir.isDirectory())
         {
-            dir.mkdir();
+            Files.createDirectory(dir.toPath());
         }
     }
 }

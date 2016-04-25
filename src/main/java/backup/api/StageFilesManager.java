@@ -47,7 +47,7 @@ public final class StageFilesManager
 
             LOGGER.info("copying: " + from + " -> " + to);
 
-            to.toFile().getParentFile().mkdirs();
+            com.google.common.io.Files.createParentDirs(to.toFile());
 
             Files.copy(from, to, StandardCopyOption.COPY_ATTRIBUTES);
         }

@@ -10,5 +10,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="backup.gui.BackupUtilsGui"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="backup-utils"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dbase.dir=D:/mike/Documents/backup-utils"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dbase.dir=D:/mike/Documents"/>
 </launchConfiguration>

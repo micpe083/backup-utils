@@ -8,32 +8,40 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class FileViewer extends BorderPane
 {
     private final TextArea textArea;
+    private final TextField textField;
 
     public FileViewer()
     {
         textArea = new TextArea();
         textArea.setEditable(false);
 
+        textField = new TextField();
+        textField.setEditable(false);
+
         final ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(textArea);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
+        setTop(textField);
         setCenter(scrollPane);
     }
 
     private void readFile(final File file) throws Exception
     {
         textArea.setText("");
+        textField.setText("");
 
         if (file != null)
         {
+            textField.setText(file.getAbsolutePath());
             textArea.setText(getFileContent(file));
         }
     }
@@ -77,7 +85,7 @@ public class FileViewer extends BorderPane
                                           600);
 
             final Stage stage = new Stage();
-            stage.setTitle(file.getAbsolutePath());
+            stage.setTitle("File Viewer");
             stage.setScene(scene);
             stage.show();
         }
