@@ -116,9 +116,10 @@ public final class GuiUtils
         {
             final FileChooser fileChooser = new FileChooser();
 
-            if (selectedFile != null && selectedFile.getParentFile().isDirectory())
+            final File initialDir = getInitialDir(selectedFile);
+            if (initialDir != null)
             {
-                fileChooser.setInitialDirectory(selectedFile.getParentFile());
+                fileChooser.setInitialDirectory(initialDir);
             }
 
             file = fileChooser.showOpenDialog(scene.getWindow());
@@ -127,14 +128,38 @@ public final class GuiUtils
         {
             final DirectoryChooser fileChooser = new DirectoryChooser();
 
-            if (selectedFile != null && selectedFile.isDirectory())
+            final File initialDir = getInitialDir(selectedFile);
+            if (initialDir != null)
             {
-                fileChooser.setInitialDirectory(selectedFile);
+                fileChooser.setInitialDirectory(initialDir);
             }
 
             file = fileChooser.showDialog(scene.getWindow());
         }
 
         return file;
+    }
+
+    private static File getInitialDir(final File selectedFile)
+    {
+        final File initialDir;
+
+        if (selectedFile == null)
+        {
+            initialDir = null;
+        }
+        else
+        {
+            if (selectedFile.isDirectory())
+            {
+                initialDir = selectedFile;
+            }
+            else
+            {
+                initialDir = selectedFile.getParentFile();
+            }
+        }
+
+        return initialDir;
     }
 }

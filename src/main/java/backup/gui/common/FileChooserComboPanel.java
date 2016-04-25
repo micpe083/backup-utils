@@ -128,6 +128,9 @@ public class FileChooserComboPanel extends FileChooserAbstract
                                               getSelectedFile(),
                                               getScene());
 
-        setSelection(file);
+        if (file != null)
+        {
+            setSelection(file);
+        }
     }
 }

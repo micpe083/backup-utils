@@ -42,10 +42,8 @@ public class FileChooserPanel extends FileChooserAbstract
 
     private void selectFile()
     {
-        final File selectedFile = getSelectedFile();
-
         final File file = GuiUtils.selectFile(isFile,
-                                              selectedFile,
+                                              getSelectedFile(),
                                               getScene());
 
         if (file != null)
