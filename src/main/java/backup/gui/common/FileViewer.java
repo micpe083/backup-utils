@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 
 import backup.api.BackupUtil;
-import backup.api.DigestUtil;
 import backup.api.DigestFileUtil;
 import javafx.scene.Node;
 import javafx.scene.Scene;

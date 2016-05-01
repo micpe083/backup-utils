@@ -12,6 +12,9 @@ public class TestBackupUtil
         checkValues("c:\\test1\\", "c:\\test1\\test21\\testA.txt", "c:\\test1\\test22\\testB.txt");
         checkValues("c:\\", "c:\\testA.txt", "c:\\test1\\test22\\testB.txt");
         checkValues("c:\\", "c:\\test11\\testA.txt", "c:\\test12\\testB.txt");
+
+        checkValues(null, null, null);
+        checkValues("c:\\test12\\", null, "c:\\test12\\testB.txt");
     }
 
     @Test
@@ -20,6 +23,9 @@ public class TestBackupUtil
         checkValues("/test1/", "/test1/test21/testA.txt", "/test1/test22/testB.txt");
         checkValues("/", "/testA.txt", "/test12/testB.txt");
         checkValues("/", "/test11/testA.txt", "/test12/testB.txt");
+
+        checkValues(null, null, null);
+        checkValues("/test12/", null, "/test12/testB.txt");
     }
 
     private void checkValues(final String expected,
