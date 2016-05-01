@@ -12,6 +12,7 @@ import backup.gui.common.BackupSettings;
 import backup.gui.common.DigestSelectorPanel;
 import backup.gui.common.FileChooserPanel;
 import backup.gui.common.GuiUtils;
+import backup.gui.common.LabelTextPanel;
 import backup.gui.common.ProgressDialog;
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
@@ -21,6 +22,8 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
 {
     private final FileChooserPanel fileChooserDigestDir;
     private final FileChooserPanel fileChooserOutputDir;
+
+    private final LabelTextPanel commentsTextPanel;
 
     private final DigestSelectorPanel digestSelectorPanel;
 
@@ -34,6 +37,8 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
         fileChooserOutputDir = new FileChooserPanel("Output dir", false);
         fileChooserOutputDir.setSelection(BackupSettings.getInstance().getOutputDir());
 
+        commentsTextPanel = new LabelTextPanel("Comments:");
+
         digestSelectorPanel = new DigestSelectorPanel();
         pane.getChildren().add(digestSelectorPanel);
 
@@ -42,6 +47,7 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
 
         pane.getChildren().add(fileChooserDigestDir);
         pane.getChildren().add(fileChooserOutputDir);
+        pane.getChildren().add(commentsTextPanel);
         pane.getChildren().add(executeButton);
 
         setCenter(pane);
@@ -69,6 +75,7 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
 
             final Task<Void> task = createWorker(digestDir,
                                                  outputDir,
+                                                 commentsTextPanel.getText(),
                                                  digestAlg);
 
             final ProgressDialog dialog = new ProgressDialog(task,
@@ -88,6 +95,7 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
 
     private Task<Void> createWorker(final File digestDir,
                                     final File outputDir,
+                                    final String comment,
                                     final DigestAlg digestAlg)
     {
         return new Task<Void>()
@@ -189,6 +197,7 @@ public class DigestDirectoryPanel extends BackupUtilsPanel
 
                 digestUtil.createDigestFile(digestDir,
                                             outputDir,
+                                            comment,
                                             listener);
             }
         };

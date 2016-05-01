@@ -255,6 +255,7 @@ public class DigestUtil
 
     public File createDigestFile(final File digestDir,
                                  final File outputDir,
+                                 final String comment,
                                  final DigestProgressListener progress) throws IOException
     {
         validateDir(digestDir);
@@ -301,6 +302,7 @@ public class DigestUtil
                       processedCount,
                       processedSize,
                       errorCount,
+                      comment,
                       true);
 
             final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<Path>()
@@ -370,6 +372,7 @@ public class DigestUtil
                       processedCount,
                       processedSize,
                       errorCount,
+                      comment,
                       false);
         }
 
@@ -386,6 +389,7 @@ public class DigestUtil
                            final AtomicLong processedCount,
                            final AtomicLong processedSize,
                            final AtomicLong errorCount,
+                           final String comment,
                            final boolean isHeader) throws IOException
     {
         writeInfo(writer,
@@ -397,6 +401,7 @@ public class DigestUtil
                   processedCount,
                   processedSize,
                   errorCount,
+                  comment,
                   isHeader);
 
         writeInfo(writerErr,
@@ -408,6 +413,7 @@ public class DigestUtil
                   processedCount,
                   processedSize,
                   errorCount,
+                  comment,
                   isHeader);
     }
 
@@ -420,8 +426,13 @@ public class DigestUtil
                            final AtomicLong processedCount,
                            final AtomicLong processedSize,
                            final AtomicLong errorCount,
+                           final String comment,
                            final boolean isHeader) throws IOException
     {
+        writeLine(writer, "", true);
+        writeLine(writer, "Comment: " + comment, true);
+        writeLine(writer, "", true);
+
         writeLine(writer, "Started: " + stopWatch.getStartDate(), true);
 
         if (stopWatch.isStopped())
