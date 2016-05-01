@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 
 import backup.api.BackupUtil;
+import backup.api.DigestUtil;
+import backup.api.ZipUtil;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -71,13 +73,16 @@ public class FileViewer extends BorderPane
         return buf.toString();
     }
 
-    public static FileViewer view(final File file,
+    public static FileViewer view(final File zipFile,
                                   final Node node)
     {
         final FileViewer fileViewer = new FileViewer();
 
         try
         {
+            final File file = ZipUtil.unzip(zipFile,
+                                            DigestUtil.DIGEST_FILE_TYPE);
+
             fileViewer.readFile(file);
 
             final Scene scene = new Scene(fileViewer,
@@ -92,7 +97,7 @@ public class FileViewer extends BorderPane
         catch (Exception e)
         {
             GuiUtils.showErrorMessage(node,
-                                      "Failed to show file: " + file,
+                                      "Failed to show file: " + zipFile,
                                       "Error",
                                       e);
         }

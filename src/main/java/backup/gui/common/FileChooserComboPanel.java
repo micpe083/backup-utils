@@ -97,7 +97,7 @@ public class FileChooserComboPanel extends FileChooserAbstract
             public boolean accept(final File dir,
                                   final String name)
             {
-                return name.endsWith(DigestUtil.DIGEST_FILE_TYPE);
+                return name.endsWith(DigestUtil.DIGEST_FILE_TYPE_ZIP);
             }
         });
 

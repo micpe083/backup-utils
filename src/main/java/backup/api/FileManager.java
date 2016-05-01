@@ -2,7 +2,6 @@ package backup.api;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -140,9 +139,12 @@ public class FileManager
         map.clear();
     }
 
-    public void loadDigestFile(final File file) throws IOException
+    public void loadDigestFile(final File zipFile) throws Exception
     {
         clear();
+
+        final File file = ZipUtil.unzip(zipFile,
+                                        DigestUtil.DIGEST_FILE_TYPE);
 
         try (final BufferedReader reader = BackupUtil.createReader(file))
         {

@@ -29,6 +29,7 @@ public class DigestUtil
 {
     public static final String DIGEST_FILE_TYPE = ".digest.txt";
     public static final String DIGEST_FILE_TYPE_ERR = ".digest.err.txt";
+    public static final String DIGEST_FILE_TYPE_ZIP = ".digest.zip";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DigestUtil.class);
 
@@ -271,6 +272,7 @@ public class DigestUtil
 
         final File outputFile = new File(outputDir, outputFilename + DIGEST_FILE_TYPE);
         final File outputFileErr = new File(outputDir, outputFilename + DIGEST_FILE_TYPE_ERR);
+        final File outputZipFile = new File(outputDir, outputFilename + DIGEST_FILE_TYPE_ZIP);
 
         LOGGER.info("Writing digest file: " + outputFile);
 
@@ -376,7 +378,14 @@ public class DigestUtil
                       false);
         }
 
-        return outputFile;
+        ZipUtil.zip(outputZipFile,
+                    outputFile,
+                    outputFileErr);
+
+        Files.delete(outputFile.toPath());
+        Files.delete(outputFileErr.toPath());
+
+        return outputZipFile;
     }
 
     private void writeInfo(final Writer writer,
