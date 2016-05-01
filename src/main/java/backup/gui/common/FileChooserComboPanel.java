@@ -129,7 +129,26 @@ public class FileChooserComboPanel extends FileChooserAbstract
 
     private void refresh()
     {
-        setSelection(getSelectedFile());
+        final File selectedFile = getSelectedFile();
+
+        if (selectedFile == null)
+        {
+            try
+            {
+                setSelection(BackupSettings.getInstance().getOutputDir());
+            }
+            catch (IOException e)
+            {
+                GuiUtils.showErrorMessage(this,
+                                          "Failed to refresh files",
+                                          "Error",
+                                          e);
+            }
+        }
+        else
+        {
+            setSelection(selectedFile);
+        }
     }
 
     private void selectFile(final boolean isFile)
