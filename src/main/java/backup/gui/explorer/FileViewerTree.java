@@ -65,6 +65,13 @@ public class FileViewerTree extends FileViewer
         }
     }
 
+    @Override
+    public FileManager getSelected()
+    {
+        // not supported in tree view
+        return null;
+    }
+
     private void expandAll(final TreeItem<FileTreeNode> treeItem,
                            final boolean isExpand)
     {

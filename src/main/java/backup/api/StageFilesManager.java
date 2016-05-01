@@ -20,24 +20,29 @@ public final class StageFilesManager
     {
     }
 
-    public static FileManager stageMissingFiles(final FileManager source,
-                                                final FileManager target) throws Exception
+    public static FileManager stageMissing(final FileManager source,
+                                           final FileManager target) throws Exception
     {
         final FileManager missing = source.getMissing(target);
         final FileManager missingUnique = missing.getUniquePaths();
 
-        LOGGER.info("staging file summary: " + missingUnique.getFileSum());
+        return stage(missingUnique);
+    }
 
-        final Path baseDir = missingUnique.getBaseDir();
+    public static FileManager stage(final FileManager fileManager) throws Exception
+    {
+        LOGGER.info("staging file summary: " + fileManager.getFileSum());
 
-        LOGGER.info("staging missing files from: " + baseDir);
+        final Path baseDir = fileManager.getBaseDir();
+
+        LOGGER.info("staging files from: " + baseDir);
 
         final Path stagingDir = new File(BackupSettings.getInstance().getStagingDir(),
                                          BackupUtil.getFilenameTimestamp()).toPath();
 
-        LOGGER.info("staging missing files to: " + stagingDir);
+        LOGGER.info("staging files to: " + stagingDir);
 
-        for (final Entry<FileInfo, List<String>> entry : missingUnique.getMap().entrySet())
+        for (final Entry<FileInfo, List<String>> entry : fileManager.getMap().entrySet())
         {
             final List<String> paths = entry.getValue();
 
@@ -52,6 +57,6 @@ public final class StageFilesManager
             Files.copy(from, to, StandardCopyOption.COPY_ATTRIBUTES);
         }
 
-        return missingUnique;
+        return fileManager;
     }
 }

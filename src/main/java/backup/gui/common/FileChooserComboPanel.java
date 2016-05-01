@@ -1,8 +1,10 @@
 package backup.gui.common;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
+import backup.api.DigestUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -89,7 +91,15 @@ public class FileChooserComboPanel extends FileChooserAbstract
             throw new IllegalArgumentException("file doesn't exist: " + file);
         }
 
-        final File[] files = dir == null ? null : dir.listFiles();
+        final File[] files = dir == null ? null : dir.listFiles(new FilenameFilter()
+        {
+            @Override
+            public boolean accept(final File dir,
+                                  final String name)
+            {
+                return name.endsWith(DigestUtil.DIGEST_FILE_TYPE);
+            }
+        });
 
         if (files != null)
         {

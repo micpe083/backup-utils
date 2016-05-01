@@ -70,8 +70,8 @@ public class ComparePanel extends BackupUtilsPanel
 
         try
         {
-            final FileManager copiedFiles = StageFilesManager.stageMissingFiles(fileManager1,
-                                                                                fileManager2);
+            final FileManager copiedFiles = StageFilesManager.stageMissing(fileManager1,
+                                                                           fileManager2);
 
             FileExplorer.show(copiedFiles);
         }

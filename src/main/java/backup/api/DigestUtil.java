@@ -27,6 +27,9 @@ import com.google.common.hash.Hashing;
 
 public class DigestUtil
 {
+    public static final String DIGEST_FILE_TYPE = ".digest.txt";
+    public static final String DIGEST_FILE_TYPE_ERR = ".digest.err.txt";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DigestUtil.class);
 
     public static final String REGEX_FILE = "file";
@@ -41,7 +44,7 @@ public class DigestUtil
 
         private final int len;
 
-        DigestAlg(final int len)
+        private DigestAlg(final int len)
         {
             this.len = len;
         }
@@ -265,8 +268,8 @@ public class DigestUtil
 
         final String outputFilename = "out_" + BackupUtil.getFilenameTimestamp() + "_" + digestAlg.getName().toLowerCase() + "_" + digestDir.getName();
 
-        final File outputFile = new File(outputDir, outputFilename + ".txt");
-        final File outputFileErr = new File(outputDir, outputFilename + ".err.txt");
+        final File outputFile = new File(outputDir, outputFilename + DIGEST_FILE_TYPE);
+        final File outputFileErr = new File(outputDir, outputFilename + DIGEST_FILE_TYPE_ERR);
 
         LOGGER.info("Writing digest file: " + outputFile);
 

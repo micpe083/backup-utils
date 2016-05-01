@@ -1,5 +1,7 @@
 package backup.gui.common;
 
+import java.io.File;
+
 import backup.api.FileManager;
 import backup.gui.explorer.FileExplorer;
 import javafx.scene.control.Button;
@@ -54,7 +56,12 @@ public class DigestFilePanel extends VBox
     {
         try
         {
-            FileManagerUtil.loadDigestFile(fileChooserDigestFile, fileManager);
+            final File digestFile = fileChooserDigestFile.getSelectedFileWarn();
+
+            if (digestFile != null)
+            {
+                fileManager.loadDigestFile(digestFile);
+            }
 
             statsPanel.setFileManager(fileManager);
         }

@@ -66,16 +66,6 @@ public final class GuiUtils
         return titledPane;
     }
 
-    public static void setBorder(final Node pane)
-    {
-        final String cssDefault = "-fx-border-color: blue;\n" +
-                                  "-fx-border-insets: 5;\n" +
-                                  "-fx-border-width: 3;\n" +
-                                  "-fx-border-style: dashed;\n";
-
-        pane.setStyle(cssDefault);
-    }
-
     public static String getSelectedFileStr(final String selectedFileStr)
     {
         return Strings.isNullOrEmpty(selectedFileStr) ? null : selectedFileStr;

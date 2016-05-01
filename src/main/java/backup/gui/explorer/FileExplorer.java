@@ -8,6 +8,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import backup.api.FileInfo;
 import backup.api.FileManager;
+import backup.api.StageFilesManager;
 import backup.api.filter.FileManagerFilter;
 import backup.gui.common.GuiUtils;
 import backup.gui.common.StatsPanel;
@@ -44,6 +45,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
         vbox.getChildren().add(GuiUtils.createTitledPane("Filters", filterPanel, false));
 
         final HBox buttonPanel = new HBox();
+
         final Button treeButton = new Button("Tree View");
         treeButton.setOnAction(x -> setFileView(true));
         buttonPanel.getChildren().add(treeButton);
@@ -51,11 +53,49 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
         final Button listButton = new Button("List View");
         listButton.setOnAction(x -> setFileView(false));
         buttonPanel.getChildren().add(listButton);
+
+        final Button stageAllButton = new Button("Stage All");
+        stageAllButton.setOnAction(x -> stage(false));
+        buttonPanel.getChildren().add(stageAllButton);
+
+        final Button stageSelectedButton = new Button("Stage Selected");
+        stageSelectedButton.setOnAction(x -> stage(true));
+        buttonPanel.getChildren().add(stageSelectedButton);
+
         vbox.getChildren().add(buttonPanel);
 
         setBottom(vbox);
 
         setFileView(true);
+    }
+
+    private void stage(final boolean isSelected)
+    {
+        final FileManager fileManager;
+
+        if (isSelected)
+        {
+            fileManager = fileViewer.getSelected();
+        }
+        else
+        {
+            fileManager = fileManagerFiltered;
+        }
+
+        if (fileManager != null)
+        {
+            try
+            {
+                StageFilesManager.stage(fileManager);
+            }
+            catch (Exception e)
+            {
+                GuiUtils.showErrorMessage(this,
+                                          "Error staging files",
+                                          "Error",
+                                          e);
+            }
+        }
     }
 
     private void setFileView(final boolean isTree)

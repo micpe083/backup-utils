@@ -30,6 +30,15 @@ public class FileManager
     {
     }
 
+    public void addFile(final FileInfoPath fileInfoPath)
+    {
+        if (fileInfoPath != null)
+        {
+            addFile(fileInfoPath.getFileInfo(),
+                    fileInfoPath.getPath());
+        }
+    }
+
     public void addFile(final FileInfo fileInfo,
                         final String path)
     {
