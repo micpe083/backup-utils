@@ -3,6 +3,7 @@ package backup.api;
 import java.io.BufferedReader;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,8 +144,7 @@ public class FileManager
     {
         clear();
 
-        final File file = ZipUtil.unzip(zipFile,
-                                        DigestUtil.DIGEST_FILE_TYPE);
+        final File file = DigestFileUtil.getDigestFile(zipFile);
 
         try (final BufferedReader reader = BackupUtil.createReader(file))
         {
@@ -173,28 +173,19 @@ public class FileManager
 
     public Path getBaseDir()
     {
-        File commonDir = null;
+        String commonDir = null;
 
         for (final Entry<FileInfo, List<String>> entry : map.entrySet())
         {
             final List<String> paths = entry.getValue();
 
-            for (final String path : paths)
+            for (final String currPath : paths)
             {
-                final File currFile = new File(path);
-                final File currDir = currFile.getParentFile();
-
-                if (commonDir == null)
-                {
-                    commonDir = currDir;
-                }
-                else if (commonDir.toPath().startsWith(currDir.toPath()))
-                {
-                    commonDir = currDir;
-                }
+                commonDir = BackupUtil.findCommonPath(commonDir,
+                                                      currPath);
             }
         }
 
-        return commonDir == null ? null : commonDir.toPath();
+        return commonDir == null ? null : Paths.get(commonDir);
     }
 }

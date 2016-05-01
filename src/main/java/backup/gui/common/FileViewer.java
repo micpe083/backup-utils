@@ -5,7 +5,7 @@ import java.io.File;
 
 import backup.api.BackupUtil;
 import backup.api.DigestUtil;
-import backup.api.ZipUtil;
+import backup.api.DigestFileUtil;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -80,8 +80,7 @@ public class FileViewer extends BorderPane
 
         try
         {
-            final File file = ZipUtil.unzip(zipFile,
-                                            DigestUtil.DIGEST_FILE_TYPE);
+            final File file = DigestFileUtil.getDigestFile(zipFile);
 
             fileViewer.readFile(file);
 

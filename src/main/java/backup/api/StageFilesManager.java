@@ -50,11 +50,19 @@ public final class StageFilesManager
             final Path toRelativePath = baseDir.relativize(from);
             final Path to = stagingDir.resolve(toRelativePath);
 
+            // exclude Thumbs.db files
+            if (to.toFile().getName().endsWith("Thumbs.db"))
+            {
+                continue;
+            }
+
             LOGGER.info("copying: " + from + " -> " + to);
 
             com.google.common.io.Files.createParentDirs(to.toFile());
 
-            Files.copy(from, to, StandardCopyOption.COPY_ATTRIBUTES);
+            Files.copy(from,
+                       to,
+                       StandardCopyOption.COPY_ATTRIBUTES);
         }
 
         return fileManager;

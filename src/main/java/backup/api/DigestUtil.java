@@ -257,7 +257,7 @@ public class DigestUtil
     public File createDigestFile(final File digestDir,
                                  final File outputDir,
                                  final String comment,
-                                 final DigestProgressListener progress) throws IOException
+                                 final DigestProgressListener progress) throws Exception
     {
         validateDir(digestDir);
         validateDir(outputDir);
@@ -378,12 +378,9 @@ public class DigestUtil
                       false);
         }
 
-        ZipUtil.zip(outputZipFile,
-                    outputFile,
-                    outputFileErr);
-
-        Files.delete(outputFile.toPath());
-        Files.delete(outputFileErr.toPath());
+        DigestFileUtil.create(outputZipFile,
+                              outputFile,
+                              outputFileErr);
 
         return outputZipFile;
     }

@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Strings;
+
 public final class BackupUtil
 {
     private static final String CHARSET_UTF8 = "UTF-8";
@@ -37,9 +39,18 @@ public final class BackupUtil
         return reader;
     }
 
-    public static String findCommonPath(final String path1,
-                                        final String path2)
+    public static String findCommonPath(final String path1x,
+                                        final String path2x)
     {
+        if (Strings.isNullOrEmpty(path1x) &&
+            Strings.isNullOrEmpty(path2x))
+        {
+            return null;
+        }
+
+        final String path1 = Strings.isNullOrEmpty(path1x) ? path2x : path1x;
+        final String path2 = Strings.isNullOrEmpty(path2x) ? path1x : path2x;
+
         int idx = -1;
         for (int i = 0; i < Math.min(path1.length(), path2.length()); i++)
         {
