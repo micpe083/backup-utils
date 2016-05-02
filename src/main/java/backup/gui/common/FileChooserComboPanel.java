@@ -2,7 +2,6 @@ package backup.gui.common;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 
 import backup.api.DigestUtil;
 import javafx.collections.FXCollections;
@@ -18,7 +17,7 @@ public class FileChooserComboPanel extends FileChooserAbstract
     private final ComboBox<String> fileComboBox;
     private final ObservableList<String> fileList;
 
-    public FileChooserComboPanel(final String labelText) throws IOException
+    public FileChooserComboPanel(final String labelText) throws Exception
     {
         super(labelText);
 
@@ -137,7 +136,7 @@ public class FileChooserComboPanel extends FileChooserAbstract
             {
                 setSelection(BackupSettings.getInstance().getOutputDir());
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 GuiUtils.showErrorMessage(this,
                                           "Failed to refresh files",

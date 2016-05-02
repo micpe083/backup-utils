@@ -9,17 +9,19 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 
 public final class BackupUtil
 {
-    private static final String CHARSET_UTF8 = "UTF-8";
+    public static final Charset CHARSET_UTF8 = Charsets.UTF_8;
 
     private BackupUtil() {}
 
