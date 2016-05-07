@@ -50,8 +50,7 @@ public final class StageFilesManager
             final Path toRelativePath = baseDir.relativize(from);
             final Path to = stagingDir.resolve(toRelativePath);
 
-            // exclude Thumbs.db files
-            if (to.toFile().getName().endsWith("Thumbs.db"))
+            if (BackupUtil.shouldExclude(to))
             {
                 continue;
             }

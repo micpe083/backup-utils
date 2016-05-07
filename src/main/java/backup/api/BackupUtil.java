@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -128,5 +129,35 @@ public final class BackupUtil
         final String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
 
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public static boolean shouldExclude(final Path path)
+    {
+        return shouldExclude(path.toFile());
+    }
+
+    public static boolean shouldExclude(final File file)
+    {
+        return shouldExclude(file.getName());
+    }
+
+    public static boolean shouldExclude(final String filename)
+    {
+        if (filename.endsWith("desktop.ini"))
+        {
+            return true;
+        }
+
+        if (filename.endsWith("Thumbs.db"))
+        {
+            return true;
+        }
+
+        if (filename.endsWith(".class"))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

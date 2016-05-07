@@ -127,7 +127,23 @@ public class FileManager
     {
         final FileManager ret = new FileManager();
 
-        ret.map.putAll(map);
+        for (final Entry<FileInfo, List<String>> entry : map.entrySet())
+        {
+            final FileInfo fileInfo = entry.getKey();
+
+            if (!BackupUtil.shouldExclude(fileInfo.getFilename()))
+            {
+                final List<String> paths = entry.getValue();
+
+                for (final String path : paths)
+                {
+                    ret.addFile(fileInfo, path);
+                }
+            }
+        }
+
+        //ret.map.putAll(map);
+
         ret.map.keySet().removeAll(other.map.keySet());
 
         LOGGER.info("missing files: " + ret.map.size());
