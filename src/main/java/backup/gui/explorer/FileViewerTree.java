@@ -66,7 +66,7 @@ public class FileViewerTree extends FileViewer
     }
 
     @Override
-    public FileManager getSelected()
+    public FileManager getSelected(final FileManager fileManager)
     {
         // not supported in tree view
         return null;

@@ -125,30 +125,47 @@ public class FileManager
 
     public FileManager getMissing(final FileManager other)
     {
-        final FileManager ret = new FileManager();
-
-        for (final Entry<FileInfo, List<String>> entry : map.entrySet())
+        final FileManagerFilter filter = new FileManagerFilter()
         {
-            final FileInfo fileInfo = entry.getKey();
-
-            if (!BackupUtil.shouldExclude(fileInfo.getFilename()))
+            @Override
+            public boolean accept(final FileInfo fileInfo,
+                                  final List<String> paths)
             {
-                final List<String> paths = entry.getValue();
-
-                for (final String path : paths)
-                {
-                    ret.addFile(fileInfo, path);
-                }
+                return !BackupUtil.shouldExclude(fileInfo.getFilename()) &&
+                       !other.map.containsKey(fileInfo);
             }
-        }
+        };
 
-        //ret.map.putAll(map);
-
-        ret.map.keySet().removeAll(other.map.keySet());
+        final FileManager ret = getFileManager(filter);
 
         LOGGER.info("missing files: " + ret.map.size());
 
         return ret;
+
+        //final FileManager ret = new FileManager();
+        //
+        //for (final Entry<FileInfo, List<String>> entry : map.entrySet())
+        //{
+        //    final FileInfo fileInfo = entry.getKey();
+        //
+        //    if (!BackupUtil.shouldExclude(fileInfo.getFilename()))
+        //    {
+        //        final List<String> paths = entry.getValue();
+        //
+        //        for (final String path : paths)
+        //        {
+        //            ret.addFile(fileInfo, path);
+        //        }
+        //    }
+        //}
+        //
+        ////ret.map.putAll(map);
+        //
+        //ret.map.keySet().removeAll(other.map.keySet());
+        //
+        //LOGGER.info("missing files: " + ret.map.size());
+        //
+        //return ret;
     }
 
     public void clear()

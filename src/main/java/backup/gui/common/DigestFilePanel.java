@@ -2,9 +2,11 @@ package backup.gui.common;
 
 import java.io.File;
 
+import backup.api.DeleteDuplicatesManager;
 import backup.api.FileManager;
 import backup.gui.explorer.FileExplorer;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -35,9 +37,14 @@ public class DigestFilePanel extends VBox
         final Button processButton = new Button("Process File");
         processButton.setOnAction(e -> processFile());
 
+        final Button deleteDupsButton = new Button("Delete Dups");
+        deleteDupsButton.setTooltip(new Tooltip("Delete duplicate files"));
+        deleteDupsButton.setOnAction(e -> deleteDuplicateFiles());
+
         final HBox buttonPanel = new HBox();
         buttonPanel.getChildren().add(exploreButton);
         buttonPanel.getChildren().add(processButton);
+        buttonPanel.getChildren().add(deleteDupsButton);
 
         getChildren().add(buttonPanel);
     }
@@ -71,6 +78,24 @@ public class DigestFilePanel extends VBox
                                       "Failed to process directory: " + e.getMessage(),
                                       "Error",
                                       e);
+        }
+    }
+
+    public void deleteDuplicateFiles()
+    {
+        if (GuiUtils.shouldDelete())
+        {
+            try
+            {
+                DeleteDuplicatesManager.deleteDuplicates(fileManager);
+            }
+            catch (Exception e)
+            {
+                GuiUtils.showErrorMessage(this,
+                                          "Failed to delete duplicates: " + e.getMessage(),
+                                          "Error",
+                                          e);
+            }
         }
     }
 }

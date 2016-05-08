@@ -13,7 +13,7 @@ public abstract class FileViewer extends BorderPane
 
     public abstract void setFileManager(FileManager fileManager);
 
-    public abstract FileManager getSelected();
+    public abstract FileManager getSelected(FileManager fileManager);
 
     public void addListener(final PathSelectionListener l)
     {

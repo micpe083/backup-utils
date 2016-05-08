@@ -1,8 +1,11 @@
 package backup.gui.explorer;
 
+import java.util.List;
+
 import backup.api.FileInfo;
 import backup.api.FileInfoPath;
 import backup.api.FileManager;
+import backup.api.filter.FileManagerFilter;
 import javafx.collections.ObservableList;
 
 public class FileViewerList extends FileViewer
@@ -33,17 +36,29 @@ public class FileViewerList extends FileViewer
     }
 
     @Override
-    public FileManager getSelected()
+    public FileManager getSelected(final FileManager fileManager)
     {
-        final FileManager fileManager = new FileManager();
+        final FileManager fileManagerSelected = new FileManager();
 
         final ObservableList<FileInfoPath> selectedItems = table.getTableView().getSelectionModel().getSelectedItems();
 
         for (final FileInfoPath fileInfoPath : selectedItems)
         {
-            fileManager.addFile(fileInfoPath);
+            fileManagerSelected.addFile(fileInfoPath);
         }
 
-        return fileManager;
+        final FileManagerFilter filter = new FileManagerFilter()
+        {
+            @Override
+            public boolean accept(final FileInfo fileInfo,
+                                  final List<String> paths)
+            {
+                return fileManagerSelected.getMap().containsKey(fileInfo);
+            }
+        };
+
+        final FileManager ret = fileManager.getFileManager(filter);
+
+        return ret;
     }
 }

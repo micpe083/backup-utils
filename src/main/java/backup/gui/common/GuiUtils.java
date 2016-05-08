@@ -1,6 +1,7 @@
 package backup.gui.common;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import com.google.common.base.Strings;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -22,6 +24,23 @@ public final class GuiUtils
     private static final Logger LOGGER = LoggerFactory.getLogger(GuiUtils.class);
 
     private GuiUtils() {}
+
+    public static boolean shouldDelete()
+    {
+        return yesNoAlert("Delete Files",
+                          "File are about to be deleted!");
+    }
+
+    public static boolean yesNoAlert(final String title,
+                                     final String headerText)
+    {
+        final Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText("Are you ok with this?");
+        final Optional<ButtonType> result = alert.showAndWait();
+        return result.get() == ButtonType.OK;
+    }
 
     public static void showErrorMessage(final Node root,
                                         final String message,

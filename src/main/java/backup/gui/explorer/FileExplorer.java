@@ -1,11 +1,6 @@
 package backup.gui.explorer;
 
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import backup.api.DeleteDuplicatesManager;
 import backup.api.FileInfo;
 import backup.api.FileManager;
 import backup.api.StageFilesManager;
@@ -13,6 +8,12 @@ import backup.api.filter.FileManagerFilter;
 import backup.gui.common.GuiUtils;
 import backup.gui.common.StatsPanel;
 import backup.gui.filter.FilterPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class FileExplorer extends BorderPane implements PathSelectionListener
 {
@@ -62,6 +63,10 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
         stageSelectedButton.setOnAction(x -> stage(true));
         buttonPanel.getChildren().add(stageSelectedButton);
 
+        final Button deleteDupsSelectedButton = new Button("Delete Dups Selected");
+        deleteDupsSelectedButton.setOnAction(x -> deleteDups());
+        buttonPanel.getChildren().add(deleteDupsSelectedButton);
+
         vbox.getChildren().add(buttonPanel);
 
         setBottom(vbox);
@@ -75,7 +80,7 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
 
         if (isSelected)
         {
-            fileManager = fileViewer.getSelected();
+            fileManager = fileViewer.getSelected(fileManagerFiltered);
         }
         else
         {
@@ -94,6 +99,29 @@ public class FileExplorer extends BorderPane implements PathSelectionListener
                                           "Error staging files",
                                           "Error",
                                           e);
+            }
+        }
+    }
+
+    private void deleteDups()
+    {
+        final FileManager fileManager = fileViewer.getSelected(fileManagerFiltered);
+
+        if (fileManager != null)
+        {
+            if (GuiUtils.shouldDelete())
+            {
+                try
+                {
+                    DeleteDuplicatesManager.deleteDuplicates(fileManager);
+                }
+                catch (Exception e)
+                {
+                    GuiUtils.showErrorMessage(this,
+                                              "Error deleting duplicate files",
+                                              "Error",
+                                              e);
+                }
             }
         }
     }
