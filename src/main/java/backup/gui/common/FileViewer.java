@@ -59,6 +59,8 @@ public class FileViewer extends BorderPane
 
             final File fileErr = DigestFileUtil.getDigestErrFile(zipFile);
             textArea.appendText(getContent(fileErr));
+
+            textArea.positionCaret(0);
         }
     }
 
