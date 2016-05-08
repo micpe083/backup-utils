@@ -47,6 +47,7 @@ public class DigestUtil
 
     public enum DigestAlg
     {
+        NO_DIGEST (1),
         MD5 (32),
         SHA1 (40),
         SHA256 (64);
@@ -66,6 +67,29 @@ public class DigestUtil
         public String getName()
         {
             return name();
+        }
+    }
+
+    public interface Digester
+    {
+        String digest(File file) throws IOException;
+    }
+
+    private static class DigesterGoogle implements Digester
+    {
+        private final HashFunction hashFunction;
+
+        private DigesterGoogle(final HashFunction hashFunction)
+        {
+            this.hashFunction = hashFunction;
+        }
+
+        @Override
+        public String digest(final File file) throws IOException
+        {
+            final HashCode hashCode = com.google.common.io.Files.hash(file, hashFunction);
+
+            return hashCode.toString();
         }
     }
 
@@ -181,25 +205,37 @@ public class DigestUtil
                                 path);
     }
 
-    private HashFunction getHashFunction()
+    private Digester getDigester()
     {
-        final HashFunction hashFunction;
+        final Digester digester;
 
         switch (digestAlg)
         {
+            case NO_DIGEST:
+            {
+                digester = new Digester()
+                {
+                    @Override
+                    public String digest(final File file) throws IOException
+                    {
+                        return "0";
+                    }
+                };
+                break;
+            }
             case MD5:
             {
-                hashFunction = Hashing.md5();
+                digester = new DigesterGoogle(Hashing.md5());
                 break;
             }
             case SHA1:
             {
-                hashFunction = Hashing.sha1();
+                digester = new DigesterGoogle(Hashing.sha1());
                 break;
             }
             case SHA256:
             {
-                hashFunction = Hashing.sha256();
+                digester = new DigesterGoogle(Hashing.sha256());
                 break;
             }
             default:
@@ -208,16 +244,14 @@ public class DigestUtil
             }
         }
 
-        return hashFunction;
+        return digester;
     }
 
     private String getDigest(final File file) throws IOException
     {
-        final HashFunction hashFunction = getHashFunction();
+        final Digester digester = getDigester();
 
-        final HashCode hashCode = com.google.common.io.Files.hash(file, hashFunction);
-
-        return hashCode.toString();
+        return digester.digest(file);
     }
 
     public FileInfo toFileInfo(final File file) throws IOException

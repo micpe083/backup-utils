@@ -16,16 +16,23 @@ public class DigestSelectorPanel extends HBox
 
         getChildren().add(label);
 
+        RadioButton defaultButton = null;
+
         for (final DigestAlg digestAlg : DigestAlg.values())
         {
             final RadioButton digestButton = new RadioButton(digestAlg.getName());
+
+            if (digestAlg == DigestAlg.MD5)
+            {
+                defaultButton = digestButton;
+            }
 
             digestButton.setToggleGroup(group);
 
             getChildren().add(digestButton);
         }
 
-        group.getToggles().get(0).setSelected(true);
+        defaultButton.setSelected(true);
     }
 
     public DigestAlg getDigestAlg()
