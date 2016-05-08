@@ -56,6 +56,11 @@ public class FileInfoTablePanel extends BorderPane
         col4.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
         tableView.getColumns().add(col4);
 
+        final TableColumn<FileInfoPath, String> col5 = new TableColumn<>("Timestamp");
+        col5.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getFileInfo().getLastModifiedStr()));
+        col5.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
+        tableView.getColumns().add(col5);
+
         tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         //pathList.setVisibleRowCount(4);
         tableView.setPrefHeight(100);

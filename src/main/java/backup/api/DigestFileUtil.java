@@ -92,7 +92,7 @@ public final class DigestFileUtil
                          final BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER))
                     {
                         int count;
-                        final byte data[] = new byte[BUFFER];
+                        final byte[] data = new byte[BUFFER];
 
                         while ((count = zis.read(data, 0, BUFFER)) != -1)
                         {

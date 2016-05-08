@@ -14,7 +14,7 @@ import backup.gui.common.BackupSettings;
 
 public final class StageFilesManager
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StageFilesManager.class);
 
     private StageFilesManager()
     {

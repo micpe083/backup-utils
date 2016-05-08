@@ -7,10 +7,16 @@ import java.io.Writer;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +43,7 @@ public class DigestUtil
     public static final String REGEX_FILE = "file";
     public static final String REGEX_DIGEST = "digest";
     public static final String REGEX_SIZE = "size";
+    public static final String REGEX_LAST_MODIFIED = "lastModified";
 
     public enum DigestAlg
     {
@@ -45,7 +53,7 @@ public class DigestUtil
 
         private final int len;
 
-        private DigestAlg(final int len)
+        DigestAlg(final int len)
         {
             this.len = len;
         }
@@ -111,7 +119,7 @@ public class DigestUtil
     {
         final String digestName = digestAlg.getName();
 
-        final String fileInfoRegex = "^" + digestName + " \\((?<" + REGEX_FILE + ">.*)\\) = (?<" + REGEX_DIGEST + ">[a-fA-F\\d]{" + digestAlg.getLen() + "}) (?<" + REGEX_SIZE + ">\\d.*)$";
+        final String fileInfoRegex = "^" + digestName + " \\((?<" + REGEX_FILE + ">.*)\\) = (?<" + REGEX_DIGEST + ">[a-fA-F\\d]{" + digestAlg.getLen() + "}) (?<" + REGEX_SIZE + ">\\d+)(?<" + REGEX_LAST_MODIFIED + ">.*)$";
 
         return fileInfoRegex;
     }
@@ -127,6 +135,8 @@ public class DigestUtil
         buf.append(fileInfo.getDigest());
         buf.append(" ");
         buf.append(fileInfo.getSize());
+        buf.append(" ");
+        buf.append(fileInfo.getLastModifiedStr());
 
         return buf.toString();
     }
@@ -143,15 +153,29 @@ public class DigestUtil
         final String path = matcher.group(REGEX_FILE);
         final String digest = matcher.group(REGEX_DIGEST);
         final String sizeStr = matcher.group(REGEX_SIZE);
+        final String lastModifiedStr = matcher.group(REGEX_LAST_MODIFIED);
 
         final File file = new File(path);
         final String fileBaseName = file.getName();
 
         final long size = Long.parseLong(sizeStr);
 
+        final long lastModified;
+
+        if (lastModifiedStr == null ||
+            Strings.isEmpty(lastModifiedStr.trim()))
+        {
+            lastModified = 0;
+        }
+        else
+        {
+            lastModified = getFileLastModified(lastModifiedStr.trim());
+        }
+
         final FileInfo fileInfo = new FileInfo(fileBaseName,
                                                digest,
-                                               size);
+                                               size,
+                                               lastModified);
 
         return new FileInfoPath(fileInfo,
                                 path);
@@ -200,13 +224,33 @@ public class DigestUtil
     {
         final String digest = getDigest(file);
 
-        final long size = file.length();
+        final BasicFileAttributes attributes = Files.readAttributes(file.toPath(),
+                                                                    BasicFileAttributes.class,
+                                                                    LinkOption.NOFOLLOW_LINKS);
+
+        final long size = attributes.size();
+        final long lastModified = attributes.lastModifiedTime().toMillis();
 
         final FileInfo fileInfo = new FileInfo(file.getCanonicalPath(),
                                                digest,
-                                               size);
+                                               size,
+                                               lastModified);
 
         return fileInfo;
+    }
+
+    static String getFileLastModified(final long lastModified)
+    {
+        final ZonedDateTime utc = Instant.ofEpochMilli(lastModified).atZone(ZoneOffset.UTC);
+
+        return utc.format(DateTimeFormatter.ISO_INSTANT);
+    }
+
+    static long getFileLastModified(final String lastModified)
+    {
+        final TemporalAccessor creationAccessor = DateTimeFormatter.ISO_INSTANT.parse(lastModified);
+
+        return Instant.from(creationAccessor).toEpochMilli();
     }
 
     public void print(final FileManager fileManager)

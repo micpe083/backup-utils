@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public final class DeleteDuplicatesManager
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteDuplicatesManager.class);
 
     private DeleteDuplicatesManager()
     {
