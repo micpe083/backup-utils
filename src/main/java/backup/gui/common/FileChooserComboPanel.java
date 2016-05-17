@@ -3,7 +3,7 @@ package backup.gui.common;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import backup.api.DigestUtil;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -17,15 +17,24 @@ public class FileChooserComboPanel extends FileChooserAbstract
     private final ComboBox<String> fileComboBox;
     private final ObservableList<String> fileList;
 
-    public FileChooserComboPanel(final String labelText) throws Exception
+    private final ObjectProperty<String> fileProperty;
+
+    private final FilenameFilter filter;
+
+    public FileChooserComboPanel(final String labelText,
+                                 final FilenameFilter filter) throws Exception
     {
         super(labelText);
+
+        this.filter = filter;
 
         final Label label = new Label(labelText);
 
         fileList = FXCollections.observableArrayList();
         fileComboBox = new ComboBox<>(fileList);
-        fileComboBox.valueProperty().addListener((x, y, z) -> fileComboBox.setTooltip(new Tooltip(z)));
+        fileProperty = fileComboBox.valueProperty();
+        //fileComboBox.valueProperty().addListener((x, y, z) -> fileComboBox.setTooltip(new Tooltip(z)));
+        fileProperty.addListener((x, y, z) -> fileComboBox.setTooltip(new Tooltip(z)));
 
         final Button dirButton = new Button("Dir");
         dirButton.setOnAction(e -> selectFile(false));
@@ -33,13 +42,13 @@ public class FileChooserComboPanel extends FileChooserAbstract
         final Button fileButton = new Button("File");
         fileButton.setOnAction(e -> selectFile(true));
 
-        final Button viewButton = new Button("V");
-        viewButton.setTooltip(new Tooltip("View File"));
-        viewButton.setOnAction(e -> viewFile());
-
         final Button refreshButton = new Button("R");
         refreshButton.setTooltip(new Tooltip("Refresh"));
         refreshButton.setOnAction(e -> refresh());
+
+        //final Button viewButton = new Button("V");
+        //viewButton.setTooltip(new Tooltip("View File"));
+        //viewButton.setOnAction(e -> viewFile());
 
         setLeft(label);
         setCenter(fileComboBox);
@@ -48,18 +57,23 @@ public class FileChooserComboPanel extends FileChooserAbstract
         buttonPane.getChildren().add(dirButton);
         buttonPane.getChildren().add(fileButton);
         buttonPane.getChildren().add(refreshButton);
-        buttonPane.getChildren().add(viewButton);
+        //buttonPane.getChildren().add(viewButton);
         setRight(buttonPane);
     }
 
-    private void viewFile()
-    {
-        final File file = getSelectedFileWarn();
+    //private void viewFile()
+    //{
+    //    final File file = getSelectedFileWarn();
+    //
+    //    if (file != null)
+    //    {
+    //        FileViewer.view(file, this);
+    //    }
+    //}
 
-        if (file != null)
-        {
-            FileViewer.view(file, this);
-        }
+    public ObjectProperty<String> getFileProperty()
+    {
+        return fileProperty;
     }
 
     public void setSelection(final File file)
@@ -90,15 +104,20 @@ public class FileChooserComboPanel extends FileChooserAbstract
             throw new IllegalArgumentException("file doesn't exist: " + file);
         }
 
-        final File[] files = dir == null ? null : dir.listFiles(new FilenameFilter()
+        final File[] files;
+
+        if (dir == null)
         {
-            @Override
-            public boolean accept(final File dir,
-                                  final String name)
-            {
-                return name.endsWith(DigestUtil.DIGEST_FILE_TYPE_ZIP);
-            }
-        });
+            files = null;
+        }
+        else if (filter == null)
+        {
+            files = dir.listFiles();
+        }
+        else
+        {
+            files = dir.listFiles(filter);
+        }
 
         if (files != null)
         {
@@ -115,6 +134,7 @@ public class FileChooserComboPanel extends FileChooserAbstract
         {
             fileComboBox.getSelectionModel().select(select);
         }
+
         //else if (!fileList.isEmpty())
         //{
         //    fileComboBox.getSelectionModel().select(fileList.get(0));
@@ -123,7 +143,8 @@ public class FileChooserComboPanel extends FileChooserAbstract
 
     protected String getSelectedFileStr2()
     {
-        return fileComboBox.getSelectionModel().getSelectedItem();
+        //return fileComboBox.getSelectionModel().getSelectedItem();
+        return fileProperty.get();
     }
 
     private void refresh()

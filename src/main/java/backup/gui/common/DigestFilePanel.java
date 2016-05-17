@@ -1,8 +1,10 @@
 package backup.gui.common;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import backup.api.DeleteDuplicatesManager;
+import backup.api.DigestUtil;
 import backup.api.FileManager;
 import backup.gui.explorer.FileExplorer;
 import javafx.scene.control.Button;
@@ -25,17 +27,33 @@ public class DigestFilePanel extends VBox
 
     public DigestFilePanel(final String text) throws Exception
     {
-        fileChooserDigestFile = new FileChooserComboPanel(text);
+        final FilenameFilter filter = new FilenameFilter()
+        {
+            @Override
+            public boolean accept(final File dir,
+                                  final String name)
+            {
+                return name.endsWith(DigestUtil.DIGEST_FILE_TYPE_ZIP);
+            }
+        };
+
+        fileChooserDigestFile = new FileChooserComboPanel(text, filter);
         GuiUtils.setFile(fileChooserDigestFile);
 
         getChildren().add(fileChooserDigestFile);
         getChildren().add(statsPanel);
 
         final Button exploreButton = new Button("Explore");
+        exploreButton.setTooltip(new Tooltip("Explore File"));
         exploreButton.setOnAction(e -> FileExplorer.show(fileManager));
 
-        final Button processButton = new Button("Process File");
-        processButton.setOnAction(e -> processFile());
+        final Button processButton = new Button("Process");
+        processButton.setTooltip(new Tooltip("Process File"));
+        processButton.setOnAction(e -> processFile(true));
+
+        final Button viewButton = new Button("View");
+        viewButton.setTooltip(new Tooltip("View File"));
+        viewButton.setOnAction(e -> viewFile());
 
         final Button deleteDupsButton = new Button("Delete Dups");
         deleteDupsButton.setTooltip(new Tooltip("Delete duplicate files"));
@@ -44,9 +62,12 @@ public class DigestFilePanel extends VBox
         final HBox buttonPanel = new HBox();
         buttonPanel.getChildren().add(exploreButton);
         buttonPanel.getChildren().add(processButton);
+        buttonPanel.getChildren().add(viewButton);
         buttonPanel.getChildren().add(deleteDupsButton);
 
         getChildren().add(buttonPanel);
+
+        fileChooserDigestFile.getFileProperty().addListener(e -> processFile(false));
     }
 
     public void setSelection(final String text)
@@ -59,11 +80,20 @@ public class DigestFilePanel extends VBox
         return fileManager;
     }
 
-    public void processFile()
+    public void processFile(final boolean isWarn)
     {
         try
         {
-            final File digestFile = fileChooserDigestFile.getSelectedFileWarn();
+            final File digestFile;
+
+            if (isWarn)
+            {
+                digestFile = fileChooserDigestFile.getSelectedFileWarn();
+            }
+            else
+            {
+                digestFile = fileChooserDigestFile.getSelectedFile();
+            }
 
             if (digestFile != null)
             {
@@ -78,6 +108,16 @@ public class DigestFilePanel extends VBox
                                       "Failed to process directory: " + e.getMessage(),
                                       "Error",
                                       e);
+        }
+    }
+
+    private void viewFile()
+    {
+        final File file = fileChooserDigestFile.getSelectedFileWarn();
+
+        if (file != null)
+        {
+            FileViewer.view(file, this);
         }
     }
 

@@ -24,16 +24,18 @@ public class ComparePanel extends BackupUtilsPanel
         final DigestFilePanel digestFilePanelTarget = new DigestFilePanel("Target File:");
         vbox.getChildren().add(digestFilePanelTarget);
 
-        final Button missingButton = new Button("Missing");
+        final Button missingButton = new Button("Source Only");
+        missingButton.setTooltip(new Tooltip("Files only in Source Dir"));
         missingButton.setOnAction(e -> compare(digestFilePanelSource,
                                                digestFilePanelTarget));
 
-        final Button newButton = new Button("New");
+        final Button newButton = new Button("Target Only");
+        newButton.setTooltip(new Tooltip("Files only in Target Dir"));
         newButton.setOnAction(e -> compare(digestFilePanelTarget,
                                            digestFilePanelSource));
 
         final Button stageButton = new Button("Stage");
-        stageButton.setTooltip(new Tooltip("Copy missing files to staging area"));
+        stageButton.setTooltip(new Tooltip("Copy missing files to staging area, i.e. files in Source Dir but not in Target Dir"));
         stageButton.setOnAction(e -> stage(digestFilePanelSource,
                                            digestFilePanelTarget));
 
