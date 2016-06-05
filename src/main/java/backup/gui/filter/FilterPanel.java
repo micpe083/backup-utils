@@ -27,6 +27,7 @@ public class FilterPanel extends VBox
         add(filterPane, new FilterItemPanelSize());
         add(filterPane, new FilterItemPanelName());
         add(filterPane, new FilterItemPanelDups());
+        add(filterPane, new FilterItemPanelDir());
         getChildren().add(filterPane);
 
         final HBox hbox = new HBox();
