@@ -1,21 +1,16 @@
 package backup.api;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 public class StopWatch
 {
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    private volatile Date startDate;
-    private volatile Date endDate;
-
-    private volatile LocalTime startTime;
-    private volatile LocalTime endTime;
+    private volatile LocalDateTime startTime;
+    private volatile LocalDateTime endTime;
 
     public StopWatch()
     {
@@ -23,98 +18,127 @@ public class StopWatch
 
     public StopWatch start()
     {
-        startDate = new Date();
-        startTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+        startTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         return this;
     }
 
     public StopWatch stop()
     {
-        endDate = new Date();
-        endTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+        endTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         return this;
     }
 
     public String getStartDate()
     {
-        return format(startDate);
+        return format(startTime);
     }
 
     public boolean isStopped()
     {
-        return endDate != null;
+        return endTime != null;
     }
 
     public String getEndDate()
     {
-        return format(endDate);
+        return format(endTime);
     }
 
     public long getDurationMillis()
     {
-        final Date startDate = this.startDate;
-        final Date endDate = this.endDate;
+        final Duration ret = getDurationX();
 
-        return startDate != null && endDate != null ? endDate.getTime() - startDate.getTime() : 0;
+        return ret == null ? 0 : ret.toMillis();
     }
 
-    private String format(final Date date)
+    private Duration getDurationX()
     {
-        final String ret = date == null ? "Not set" : dateFormat.format(date);
+        final LocalDateTime startDate = this.startTime;
+        final LocalDateTime endDate = this.endTime;
+
+        final Duration ret;
+
+        if (startDate == null)
+        {
+            ret = null;
+        }
+        else
+        {
+            final LocalDateTime endTime = endDate == null ? LocalDateTime.now() : endDate;
+
+            final Duration duration = Duration.between(startDate, endTime);
+
+            ret = duration;
+        }
+
+        return ret;
+    }
+
+    private String format(final LocalDateTime date)
+    {
+        final String ret;
+
+        if (date == null)
+        {
+            ret = "Not set";
+        }
+        else
+        {
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            ret = date.format(formatter);
+        }
+
+        return ret;
+    }
+
+    private String formatTime(final LocalDateTime date)
+    {
+        final String ret;
+
+        if (date == null)
+        {
+            ret = "Not set";
+        }
+        else
+        {
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+            ret = date.format(formatter);
+        }
 
         return ret;
     }
 
     public String getDuration()
     {
-        final StringBuilder buf = new StringBuilder();
+        final LocalDateTime startTime = this.startTime;
 
-        final LocalTime startTime = this.startTime;
+        final String ret;
 
         if (startTime == null)
         {
-            buf.append("Not started");
+            ret = "Not started";
         }
         else
         {
-            final LocalTime endTime = this.endTime == null ? LocalTime.now() : this.endTime;
+            final long durationMillis = getDurationMillis();
 
-            final Duration duration = Duration.between(startTime, endTime);
-
-            addDuration(buf, duration.toMillis());
+            ret = getDuration(durationMillis);
         }
 
-        return buf.toString();
+        return ret;
     }
 
     public static String getDuration(final long duration)
     {
-        final StringBuilder buf = new StringBuilder();
-
-        addDuration(buf, duration);
-
-        return buf.toString();
-    }
-
-    private static void addDuration(final StringBuilder buf,
-                                    final long duration)
-    {
-        final long hours = TimeUnit.HOURS.convert(duration, TimeUnit.MILLISECONDS);
-        final long minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS) - 60 * TimeUnit.HOURS.convert(duration, TimeUnit.MILLISECONDS);
-        final long seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS) - 60 * TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS);
-
-        buf.append(String.format("%02d", hours));
-        buf.append(":");
-        buf.append(String.format("%02d", minutes));
-        buf.append(":");
-        buf.append(String.format("%02d", seconds));
+        return DurationFormatUtils.formatDuration(duration, "HH:mm:ss");
     }
 
     public String getDescription()
     {
         final StringBuilder buf = new StringBuilder();
 
-        final LocalTime startTime = this.startTime;
+        final LocalDateTime startTime = this.startTime;
 
         if (startTime == null)
         {
@@ -125,13 +149,13 @@ public class StopWatch
             buf.append("Duration: ").append(getDuration());
             buf.append(" ");
 
-            buf.append("Start: ").append(startTime);
+            buf.append("Start: ").append(formatTime(startTime));
             buf.append(" ");
 
-            final LocalTime endTime = this.endTime;
+            final LocalDateTime endTime = this.endTime;
             if (endTime != null)
             {
-                buf.append("End: ").append(endTime);
+                buf.append("End: ").append(formatTime(endTime));
             }
         }
 

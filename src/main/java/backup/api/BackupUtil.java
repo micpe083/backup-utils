@@ -148,6 +148,11 @@ public final class BackupUtil
             return true;
         }
 
+        if (filename.endsWith("Desktop.ini"))
+        {
+            return true;
+        }
+
         if (filename.endsWith("Thumbs.db"))
         {
             return true;
