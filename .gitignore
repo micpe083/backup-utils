@@ -1,19 +1,8 @@
-*.class
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# ignore all bin directories
-# matches "bin" in any subfolder
-bin/
+/bin/
+/build/
 
 # ignore all target directories
 /target/
@@ -21,12 +10,16 @@ bin/
 # ignore all files ending with ~
 *~
 
-# ignore eclipse files
-#.classpath
-#.project
+/.classpath
+/.project
 
 /logs/
 
 /.settings
 
-#/*.launch
+/.gradle
+
+/gradlew
+/gradlew.bat
+
+/.settings
