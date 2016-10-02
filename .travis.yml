@@ -1,13 +1,26 @@
 language: java
 
-jdk:
-  - oraclejdk8
+sudo: required
+dist: trusty
+
+before_install:
+    - echo version before upgrade
+    - java -version
+    - sudo add-apt-repository ppa:webupd8team/java
+    - sudo apt-get update -q
+    - sudo apt-get install oracle-java8-installer
+    - echo version after upgrade:
+    - java -version
+
+script:
+    - sudo apt-get update && sudo apt-get install oracle-java8-installer
+    - java -version
 
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+    - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+    - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+    directories:
+        - $HOME/.gradle/caches/
+        - $HOME/.gradle/wrapper/
